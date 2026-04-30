@@ -925,8 +925,11 @@
      letters. */
   var quizAnswers = { q1: [], q2: '', q3: '', q4: '' };
 
-  /* Fire-and-forget tracking POST. Uses sendBeacon so the request
-     survives any page transitions; falls back to fetch+keepalive. */
+  /* Fire-and-forget tracking POST.
+     Important: Apps Script web apps don't handle CORS preflight, so
+     we MUST send as text/plain (CORS "simple request" type) - never
+     application/json - or the browser blocks the request. The body
+     is still a JSON string; Apps Script parses it the same way. */
   function sendTracking(profileKey) {
     if (!TRACKING_URL) return;
     var payload = {
@@ -943,19 +946,26 @@
       user_agent:   navigator.userAgent
     };
     var body = JSON.stringify(payload);
+    if (window.console && console.log) {
+      console.log('[quiz tracking] firing:', payload);
+    }
     try {
       if (navigator.sendBeacon) {
-        var blob = new Blob([body], { type: 'application/json' });
+        var blob = new Blob([body], { type: 'text/plain;charset=utf-8' });
         if (navigator.sendBeacon(TRACKING_URL, blob)) return;
       }
       fetch(TRACKING_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: body,
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         keepalive: true,
         mode: 'no-cors'
       }).catch(function () {});
-    } catch (err) { /* silent */ }
+    } catch (err) {
+      if (window.console && console.warn) {
+        console.warn('[quiz tracking] error:', err);
+      }
+    }
   }
 
   /* =================================================================
