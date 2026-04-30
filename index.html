@@ -34,7 +34,7 @@
     --blue-card-border:    rgba(61, 139, 232, 0.25);
     --blue-solid:          #3d8be8;
 
-    /* Orange — primary CTA + accent */
+    /* Orange - primary CTA + accent */
     --orange-cta:          #ff7e00;
     --orange-cta-hover:    rgb(237, 110, 0);
     --orange-cta-active:   rgb(220, 95, 0);
@@ -51,11 +51,6 @@
     --body:                #3f4144;
     --muted:               #6f7283;
     --border-soft:         #dcdcdc;
-
-    /* Confirmation success */
-    --success-text:        rgb(30, 120, 60);
-    --success-bg:          rgba(61, 200, 100, 0.08);
-    --success-border:      rgba(61, 200, 100, 0.4);
 
     /* Type stacks */
     --serif: "Lora", "Times New Roman", Georgia, serif;
@@ -92,9 +87,7 @@
   }
 
   /* ==============================================================
-     SCREEN — fade out 150ms / fade in 300ms
-     The default `.screen` rule sets a 150ms transition (used when
-     `is-shown` is removed); `.screen.is-shown` overrides to 300ms.
+     SCREEN - fade out 150ms / fade in 300ms
      ============================================================== */
   .screen {
     display: none;
@@ -110,9 +103,7 @@
   }
 
   /* ==============================================================
-     SCREEN 1 — INTRO + QUESTION 1 (combined)
-     The warm gradient covers the top half; the question section
-     below sits on the white half of the gradient.
+     SCREEN 1 - INTRO + QUESTION 1 (combined)
      ============================================================== */
   #screen-1 {
     background: linear-gradient(180deg, #fff5e1 0%, #ffffff 50%);
@@ -126,7 +117,6 @@
     }
   }
 
-  /* Wordmark + thin centered rule */
   .wordmark {
     text-align: center;
     font-family: var(--sans);
@@ -145,7 +135,6 @@
     margin: 8px auto 24px;
   }
 
-  /* Intro typography (used only on Screen 1) */
   .intro-headline {
     font-family: var(--serif);
     font-size: 30px;
@@ -347,7 +336,7 @@
   }
 
   /* ==============================================================
-     RESULT TYPOGRAPHY
+     RESULT PAGE - identity headline (Block 1)
      ============================================================== */
   .result-headline {
     font-family: var(--serif);
@@ -356,42 +345,47 @@
     color: var(--navy);
     line-height: 1.3;
     text-align: center;
-    margin-bottom: 24px;
+    margin-bottom: 32px;
     letter-spacing: -0.005em;
   }
   @media (min-width: 768px) {
     .result-headline { font-size: 34px; }
   }
-  .result-body p {
+
+  /* ==============================================================
+     RESULT BLOCKS (Blocks 2, 3, 4)
+     Each block = small eyebrow label + body paragraph.
+     ============================================================== */
+  .result-block { margin-bottom: 32px; }
+  .result-block:last-of-type { margin-bottom: 24px; }
+
+  .result-block p {
     font-family: var(--sans);
     color: var(--body);
     font-size: 15px;
     line-height: 1.7;
-    margin-bottom: 16px;
   }
   @media (min-width: 768px) {
-    .result-body p { font-size: 17px; }
-  }
-  .result-body blockquote {
-    border: none;
-    background: none;
-    padding: 0;
-    margin: 24px 0;
-    font-family: var(--serif);
-    font-style: italic;
-    font-weight: 600;
-    font-size: 17px;
-    color: var(--orange-accent);
-    line-height: 1.7;
-  }
-  @media (min-width: 768px) {
-    .result-body blockquote { font-size: 19px; }
+    .result-block p { font-size: 17px; }
   }
 
+  /* Eyebrow label (also used inside the invitation card with --accent) */
+  .result-eyebrow {
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    line-height: 1.4;
+    margin-bottom: 10px;
+  }
+  .result-eyebrow--accent { color: var(--orange-cta); }
+
   /* ==============================================================
-     TESTIMONIAL CARDS
+     TESTIMONIAL CARDS (between Block 4 and Block 5)
      ============================================================== */
-  .testimonials { margin: 24px 0; }
+  .testimonials { margin: 28px 0; }
   .testimonial {
     background: var(--blue-card-bg);
     border: 1.5px solid var(--blue-card-border);
@@ -419,41 +413,99 @@
   }
 
   /* ==============================================================
-     BRIDGE COPY
+     INVITATION CARD (Block 5 + Urgency + Block 6)
+     Warm cream surface that contains the entire offer section:
+     recommendation, outcomes, RCT line, urgency sub-card, CTA,
+     cost-of-waiting line.
      ============================================================== */
-  .bridge {
+  .invitation {
+    background: var(--warm-cream);
+    border: 1.5px solid rgba(255, 126, 0, 0.18);
+    border-radius: 16px;
+    padding: 32px 28px;
+    margin: 32px 0 24px;
+    text-align: center;
+  }
+  @media (min-width: 768px) {
+    .invitation { padding: 40px 36px; }
+  }
+  @media (max-width: 480px) {
+    .invitation { padding: 28px 22px; margin: 28px 0 20px; }
+  }
+
+  /* Recommendation intro paragraph (sets up the bullet list) */
+  .recommendation-intro {
+    font-family: var(--sans);
+    color: var(--body);
+    font-size: 16px;
+    line-height: 1.7;
+    margin: 0 auto 16px;
+    max-width: 560px;
+  }
+  @media (min-width: 768px) {
+    .recommendation-intro { font-size: 18px; }
+  }
+
+  /* Outcome bullets ("By the end of the session you'll have:") */
+  .outcome-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 auto 20px;
+    max-width: 520px;
+    text-align: left;
+  }
+  .outcome-list li {
+    position: relative;
+    padding-left: 28px;
+    margin-bottom: 10px;
+    font-family: var(--sans);
+    color: var(--body);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  .outcome-list li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: var(--orange-cta);
+    font-weight: 700;
+    font-size: 16px;
+  }
+  .outcome-list li:last-child { margin-bottom: 0; }
+  @media (min-width: 768px) {
+    .outcome-list li { font-size: 16px; }
+  }
+  @media (max-width: 480px) {
+    .outcome-list li { font-size: 14px; padding-left: 26px; }
+  }
+
+  /* RCT credibility line (italic, muted, centered, small) */
+  .rct-line {
+    font-family: var(--sans);
+    font-style: italic;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 0 auto 24px;
+    max-width: 560px;
+  }
+  @media (min-width: 768px) {
+    .rct-line { font-size: 14px; }
+  }
+
+  /* Cost-of-waiting line beneath the CTA */
+  .cost-of-waiting {
     font-family: var(--serif);
     font-style: italic;
     color: var(--muted);
-    font-size: 15px;
-    text-align: center;
-    line-height: 1.7;
-    margin: 24px auto 16px;
-    max-width: 560px;
-  }
-
-  /* ==============================================================
-     CONFIRMATION (post-CTA)
-     ============================================================== */
-  .confirmation {
-    background: var(--success-bg);
-    border: 1.5px solid var(--success-border);
-    color: var(--success-text);
-    padding: 16px 20px;
-    border-radius: 12px;
-    text-align: center;
-    font-family: var(--sans);
-    font-size: 15px;
-    font-weight: 600;
-    line-height: 1.55;
-    margin-top: 16px;
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 18px auto 0;
+    max-width: 540px;
   }
   @media (min-width: 768px) {
-    .confirmation {
-      max-width: 480px;
-      margin-left: auto;
-      margin-right: auto;
-    }
+    .cost-of-waiting { font-size: 15px; }
   }
 
   /* ==============================================================
@@ -479,7 +531,8 @@
     .result-headline { font-size: 24px; }
     .answer { font-size: 15px; }
     .testimonial { padding: 20px 22px; }
-    .result-body blockquote { font-size: 16px; }
+    .result-block { margin-bottom: 26px; }
+    .recommendation-intro { font-size: 15px; }
   }
 </style>
 </head>
@@ -487,7 +540,7 @@
 <div class="app">
 
   <!-- ==============================================================
-       SCREEN 1 — INTRO + QUESTION 1 (combined)
+       SCREEN 1 - INTRO + QUESTION 1 (multi-select)
        ============================================================== -->
   <section class="screen is-visible is-shown" id="screen-1" data-question="1" data-mode="multi" aria-labelledby="introHeadline">
     <p class="wordmark">THE ART OF LIVING</p>
@@ -501,16 +554,16 @@
     </div>
     <h2 class="question-headline" id="q1">Which of these have you actually tried?</h2>
     <p class="question-subtext">Select all that apply.</p>
-    <div class="answers" role="radiogroup" aria-labelledby="q1">
-      <button type="button" class="answer" data-letter="A" role="radio" aria-checked="false">Meditation apps - downloaded, used for a week or two, gave up after it didn't stick.</button>
-      <button type="button" class="answer" data-letter="B" role="radio" aria-checked="false">YouTube guided meditations - work sometimes, but I can never stay consistent with it.</button>
-      <button type="button" class="answer" data-letter="C" role="radio" aria-checked="false">Breathing exercises, box breath, positive thinking - they help a little, but not enough.</button>
+    <div class="answers" role="group" aria-labelledby="q1">
+      <button type="button" class="answer" data-letter="A" aria-pressed="false">Meditation apps - downloaded, used for a week or two, gave up after it didn't stick.</button>
+      <button type="button" class="answer" data-letter="B" aria-pressed="false">YouTube guided meditations - work sometimes, but I can never stay consistent with it.</button>
+      <button type="button" class="answer" data-letter="C" aria-pressed="false">Breathing exercises, box breath, positive thinking - they help a little, but not enough.</button>
     </div>
     <button type="button" class="cta is-hidden" data-next>Next &rarr;</button>
   </section>
 
   <!-- ==============================================================
-       SCREEN 2 — QUESTION 2
+       SCREEN 2 - QUESTION 2 (auto-submit on tap)
        ============================================================== -->
   <section class="screen" id="screen-2" data-question="2" aria-labelledby="q2">
     <div class="progress">
@@ -527,7 +580,7 @@
   </section>
 
   <!-- ==============================================================
-       SCREEN 3 — QUESTION 3
+       SCREEN 3 - QUESTION 3 (auto-submit on tap)
        ============================================================== -->
   <section class="screen" id="screen-3" data-question="3" aria-labelledby="q3">
     <div class="progress">
@@ -544,7 +597,7 @@
   </section>
 
   <!-- ==============================================================
-       SCREEN 4 — QUESTION 4
+       SCREEN 4 - QUESTION 4 (auto-submit on tap)
        ============================================================== -->
   <section class="screen" id="screen-4" data-question="4" aria-labelledby="q4">
     <div class="progress">
@@ -561,26 +614,32 @@
   </section>
 
   <!-- ==============================================================
-       SCREEN 5A — RESULT: THE ACTIVE MIND
+       SCREEN 5A - RESULT: THE ACTIVE MIND
        ============================================================== -->
   <section class="screen" id="screen-5a" aria-labelledby="result-a-headline">
+    <!-- BLOCK 1: badge + identity headline -->
     <div class="badge-wrap"><span class="profile-badge">Your Type: The Active Mind</span></div>
-    <h2 class="result-headline" id="result-a-headline">You're Not Bad at Meditation. You Were Never Taught How.</h2>
+    <h2 class="result-headline" id="result-a-headline">Your Mind Isn't Broken. It's Just Faster Than the Tools You've Been Given.</h2>
 
-    <div class="result-body">
-      <p>You've tried the apps. You've watched the YouTube videos. You've sat down, closed your eyes, and told yourself to relax - and within thirty seconds your brain was already three steps ahead, replaying a conversation from last week or running through everything that could go wrong tomorrow.</p>
-
-      <p>At some point you probably concluded that you're just not a "meditation person." That your mind is too busy. That this works for everyone else but not for you.</p>
-
-      <blockquote>"Your mind isn't designed to 'clear itself' through willpower. It's designed to think, analyze, worry, plan, and ruminate. That's its job. Telling yourself to 'stop thinking' is like telling your heart to stop beating. It doesn't work that way."</blockquote>
-
-      <p>Most meditation instruction tells you to "focus on your breath," "let thoughts pass like clouds," "clear your mind." These aren't techniques. They're descriptions of what meditation feels like after you already know how to do it. It's like asking someone to play the piano beautifully without teaching them which keys to play.</p>
-
-      <p>The apps made it worse. They rented you relaxation for 10 minutes. Then your racing thoughts came back. So you opened the app again the next day. And you never actually learned a technique.</p>
-
-      <p>What you need is an approach that doesn't ask you to stop your thoughts. You need a practice that gives your mind something to settle into naturally - allowing the mental noise to quiet on its own, without a fight. People with the busiest minds often get the deepest meditations when they finally learn how to work with their biology instead of against it.</p>
+    <!-- BLOCK 2: What this says about you -->
+    <div class="result-block">
+      <div class="result-eyebrow">What This Says About You</div>
+      <p>You think for a living, even when you're not at work. Your mind replays conversations, runs scenarios, plans tomorrow at 3am. People with quieter minds don't understand it, and they haven't built the tools you actually need. This isn't a flaw to fix. It's a feature that's been pointed at the wrong problem.</p>
     </div>
 
+    <!-- BLOCK 3: Why meditation hasn't worked so far -->
+    <div class="result-block">
+      <div class="result-eyebrow">Why Meditation Hasn't Worked So Far</div>
+      <p>Most meditation instruction tells you to "focus on your breath" or "let thoughts pass like clouds." These aren't techniques; they're descriptions of what meditation feels like after you already know how to do it. Apps gave you 10 minutes of borrowed calm, then your thoughts came back, so you opened the app again the next day. After a year, you'd done a hundred sessions and learned zero techniques. That's not a willpower failure. It's a curriculum failure.</p>
+    </div>
+
+    <!-- BLOCK 4: What kind of practice fits you best -->
+    <div class="result-block">
+      <div class="result-eyebrow">What Kind of Practice Fits You Best</div>
+      <p>What works for you isn't quieter input. It's a structured rhythm your analytical mind can lock into, so it stops fighting the practice and starts driving it. The right kind of meditation gives the mind a specific job while the body shifts into a state of rest deeper than sleep. The counterintuitive part, and what most apps will never tell you, is that people with the busiest minds often get the deepest meditations once they learn the right technique. You're not the wrong person for meditation. You've had the wrong meditation.</p>
+    </div>
+
+    <!-- TESTIMONIALS (between Block 4 and Block 5) -->
     <div class="testimonials">
       <div class="testimonial">
         <div class="quote-pair">
@@ -601,35 +660,51 @@
       </div>
     </div>
 
-    <p class="bridge">"We're hosting a series of free live sessions led by senior Art of Living teachers - covering everything from the simplest steps to get started, to the ancient wisdom behind the practice, to the science of what it actually does to your mind and body. Pick the session that speaks to you."</p>
+    <!-- BLOCK 5 + URGENCY + BLOCK 6: invitation card -->
+    <div class="invitation">
+      <div class="result-eyebrow result-eyebrow--accent">Recommended Free Session</div>
+      <p class="recommendation-intro">Your recommendation: a free, live, 60-minute session led by a senior Art of Living teacher. By the end of the session you'll have:</p>
+      <ul class="outcome-list">
+        <li>Experienced your first guided meditation in this approach</li>
+        <li>Felt, not just read about, the difference between an app and a real technique</li>
+        <li>Decided whether the 3-day workshop where you learn the full practice is right for you</li>
+      </ul>
+      <p class="rct-line">A randomized controlled trial at Western University and McGill found a 40% depression remission rate at 26-week follow-up, compared to 16.3% in the active control group, using this approach to meditation.</p>
 
-    <button type="button" class="cta" data-result-cta>Choose My Free Session &rarr;</button>
-    <div class="confirmation" hidden>&check; You're on the list. Check your texts within the next hour for your personal invite.</div>
+      <button type="button" class="cta" data-result-cta>Choose My Free Session &rarr;</button>
+      <p class="cost-of-waiting">Six months from now, if nothing changes, you'll still be opening the same apps. The technique you could learn this week is one you'll wish you had three years ago.</p>
+    </div>
 
     <p class="footer">&copy; 2026 Art of Living Foundation &middot; All rights reserved</p>
   </section>
 
   <!-- ==============================================================
-       SCREEN 5B — RESULT: THE DRIVEN DOER
+       SCREEN 5B - RESULT: THE DRIVEN DOER
        ============================================================== -->
   <section class="screen" id="screen-5b" aria-labelledby="result-b-headline">
+    <!-- BLOCK 1: badge + identity headline -->
     <div class="badge-wrap"><span class="profile-badge">Your Type: The Driven Doer</span></div>
-    <h2 class="result-headline" id="result-b-headline">Relaxation Shouldn't Feel Like an Internal Battle.</h2>
+    <h2 class="result-headline" id="result-b-headline">You Don't Need an App to Rent You Calm. You Need a Technique You Own.</h2>
 
-    <div class="result-body">
-      <p>You're not burned out because you work too hard. You're burned out because the tools you've been given to recover from hard work aren't actually working.</p>
-
-      <p>Guided meditation apps feel passive and slow. You're following someone else's voice through a body scan while your brain is already three steps ahead planning tomorrow. You're consuming their meditation - not learning your own. And the moment you close the app, the restlessness returns.</p>
-
-      <blockquote>"They're not teaching you meditation. They're renting you relaxation."</blockquote>
-
-      <p>What you need isn't a relaxation tool. It's a self-sufficient practice you own completely - no app, no subscription, no guided voice, no wondering if you're doing it right.</p>
-
-      <p>You need a technique that takes 20 minutes, that you learn once from a trained teacher, and that you can practice independently for the rest of your life. No dependency. No endless content library. You learn the technique once. Then it's yours forever.</p>
-
-      <p>The research backs this up. A randomized controlled trial at Western University and McGill University found that this specific approach produced improvements in executive function, sleep quality, and anxiety - with benefits that persisted at the 26-week follow-up. This isn't experimental wellness.</p>
+    <!-- BLOCK 2: What this says about you -->
+    <div class="result-block">
+      <div class="result-eyebrow">What This Says About You</div>
+      <p>You're a doer. You move fast, get things done, and resent passive activities that don't produce results. The idea of sitting through 20 minutes of guided body-scan narration while a stranger's voice tells you to "notice your toes" is, frankly, infuriating. You don't want to be walked through relaxation. You want to learn the technique once, run it on your own, and get back to your life.</p>
     </div>
 
+    <!-- BLOCK 3: Why meditation hasn't worked so far -->
+    <div class="result-block">
+      <div class="result-eyebrow">Why Meditation Hasn't Worked So Far</div>
+      <p>Guided meditation apps were built for consumption, not mastery. Every session you do is a session you don't own; close the app, lose the calm. You're not learning a skill, you're paying a subscription to outsource one. This wasn't a fit problem. The product was wrong for someone like you.</p>
+    </div>
+
+    <!-- BLOCK 4: What kind of practice fits you best -->
+    <div class="result-block">
+      <div class="result-eyebrow">What Kind of Practice Fits You Best</div>
+      <p>What you need isn't a relaxation tool. It's a self-sufficient practice you own completely: learn it once from a trained teacher in three days, then run it independently for the rest of your life. Twenty minutes a day. No app, no subscription, no wondering if you're doing it right. The Western University and McGill randomized controlled trial documented improvements in executive function, sleep, and anxiety that persisted at the 26-week follow-up, which is what "learn it once, keep it forever" looks like in clinical data.</p>
+    </div>
+
+    <!-- TESTIMONIALS -->
     <div class="testimonials">
       <div class="testimonial">
         <div class="quote-pair">
@@ -646,35 +721,51 @@
       </div>
     </div>
 
-    <p class="bridge">"We're hosting a series of free live sessions led by senior Art of Living teachers - from the science of meditation and performance, to simple steps for beginners, to the deeper ancient wisdom behind the practice. One hour, completely free. Find the session that fits your schedule and your style."</p>
+    <!-- BLOCK 5 + URGENCY + BLOCK 6 -->
+    <div class="invitation">
+      <div class="result-eyebrow result-eyebrow--accent">Recommended Free Session</div>
+      <p class="recommendation-intro">Your recommendation: a free, live, 60-minute session led by a senior Art of Living teacher. You'll walk away with:</p>
+      <ul class="outcome-list">
+        <li>The approach demonstrated and practiced once together</li>
+        <li>A clear answer to how this is different from what you've tried before</li>
+        <li>The honest scope of the 3-day workshop, with no obligation to enroll</li>
+      </ul>
+      <p class="rct-line">A randomized controlled trial at Western University and McGill found a 40% depression remission rate at 26-week follow-up, compared to 16.3% in the active control group.</p>
 
-    <button type="button" class="cta" data-result-cta>Choose My Free Session &rarr;</button>
-    <div class="confirmation" hidden>&check; You're on the list. Check your texts within the next hour for your personal invite.</div>
+      <button type="button" class="cta" data-result-cta>Choose My Free Session &rarr;</button>
+      <p class="cost-of-waiting">Six months from now, if nothing changes, you'll still be downloading the next app. The technique you could learn this week is one you'll never need to re-buy.</p>
+    </div>
 
     <p class="footer">&copy; 2026 Art of Living Foundation &middot; All rights reserved</p>
   </section>
 
   <!-- ==============================================================
-       SCREEN 5C — RESULT: THE DEEP REST SEEKER
+       SCREEN 5C - RESULT: THE DEEP REST SEEKER
        ============================================================== -->
   <section class="screen" id="screen-5c" aria-labelledby="result-c-headline">
+    <!-- BLOCK 1: badge + identity headline -->
     <div class="badge-wrap"><span class="profile-badge">Your Type: The Deep Rest Seeker</span></div>
     <h2 class="result-headline" id="result-c-headline">You Don't Need More Sleep. You Need a Different Kind of Rest.</h2>
 
-    <div class="result-body">
-      <p>You can sleep eight hours and wake up exhausted. You can do everything right - the early bedtime, the screen limits, the breathing exercises - and still feel like you're running on empty. Mental exhaustion has become your baseline.</p>
-
-      <p>This isn't a willpower problem. And it's not because you're doing something wrong.</p>
-
-      <blockquote>"Your mind isn't designed to 'clear itself' through willpower. It's designed to think, analyze, worry, plan, and ruminate. That's its job. Telling yourself to 'stop thinking' is like telling your heart to stop beating."</blockquote>
-
-      <p>Sleep rests the body. But it doesn't clear the deeper layers of tension, anxiety, and emotional weight that accumulate over time. That backlog is what you feel when you wake up tired despite having slept. It's what makes silence feel uncomfortable rather than restorative.</p>
-
-      <p>What you need is a technique that creates a state of rest that is often deeper than sleep - allowing the nervous system to finally discharge what it's been carrying. A randomized controlled trial at Western University and McGill University found a 40% remission rate for depression (vs. 16.3% in the active control group), with improvements in sleep quality, anxiety, and executive function that persisted at the 26-week follow-up.</p>
-
-      <p>You don't need more sleep. You need a different kind of rest. And you can learn the technique in 3 days.</p>
+    <!-- BLOCK 2: What this says about you -->
+    <div class="result-block">
+      <div class="result-eyebrow">What This Says About You</div>
+      <p>You're not anxious, you're depleted. You can sleep eight hours, do everything "right," and still wake up running on empty. Mental exhaustion has become your baseline. Most people in your life can't see it because you keep showing up. But you know the difference between resting and being restored, and you haven't been restored in a long time.</p>
     </div>
 
+    <!-- BLOCK 3: Why meditation hasn't worked so far -->
+    <div class="result-block">
+      <div class="result-eyebrow">Why Meditation Hasn't Worked So Far</div>
+      <p>Silence feels uncomfortable when your nervous system is carrying a backlog. "Just sit still and breathe" is what people who don't have a backlog say. For someone in your state, passive meditation can feel worse, like staring at the load instead of moving it. That's not a failure of discipline. It's a mismatch between your physiology and the technique you were handed.</p>
+    </div>
+
+    <!-- BLOCK 4: What kind of practice fits you best -->
+    <div class="result-block">
+      <div class="result-eyebrow">What Kind of Practice Fits You Best</div>
+      <p>Sleep rests the body. It doesn't discharge what your nervous system has been holding for years. The right kind of meditation does, using a structured, rhythmic approach that actively moves accumulated tension out of the system, producing a state of rest that researchers have measured as deeper than sleep. You learn the practice in three days. Most people describe the relief in week one.</p>
+    </div>
+
+    <!-- TESTIMONIALS -->
     <div class="testimonials">
       <div class="testimonial">
         <div class="quote-pair">
@@ -691,10 +782,20 @@
       </div>
     </div>
 
-    <p class="bridge">"We're hosting a series of free live sessions led by senior Art of Living teachers - exploring the ancient wisdom behind this practice, the science of deep rest, and simple ways to finally make meditation your own. All free. All live. Find the one that feels right."</p>
+    <!-- BLOCK 5 + URGENCY + BLOCK 6 -->
+    <div class="invitation">
+      <div class="result-eyebrow result-eyebrow--accent">Recommended Free Session</div>
+      <p class="recommendation-intro">Your recommendation: a free, live, 60-minute session led by a senior Art of Living teacher. You'll walk away with:</p>
+      <ul class="outcome-list">
+        <li>Your first guided experience of this approach</li>
+        <li>An honest answer to "why doesn't more sleep fix this?"</li>
+        <li>The path to the 3-day workshop where you learn the full practice</li>
+      </ul>
+      <p class="rct-line">A randomized controlled trial at Western University and McGill found a 40% depression remission rate at 26-week follow-up, compared to 16.3% in the active control group, with improvements in sleep quality and anxiety lasting through the 26-week follow-up.</p>
 
-    <button type="button" class="cta" data-result-cta>Choose My Free Session &rarr;</button>
-    <div class="confirmation" hidden>&check; You're on the list. Check your texts within the next hour for your personal invite.</div>
+      <button type="button" class="cta" data-result-cta>Choose My Free Session &rarr;</button>
+      <p class="cost-of-waiting">Six months from now, if nothing changes, you'll still be waking up tired. The kind of rest you'd learn this week is the kind you've been missing for years.</p>
+    </div>
 
     <p class="footer">&copy; 2026 Art of Living Foundation &middot; All rights reserved</p>
   </section>
@@ -707,8 +808,6 @@
 
   /* =================================================================
      STATE
-     ----------------------------------------------------------------
-     Three-profile score object as specified:
        p1 = The Active Mind        (answer A)
        p2 = The Driven Doer        (answer B)
        p3 = The Deep Rest Seeker   (answer C)
@@ -717,12 +816,11 @@
 
   var LETTER_TO_KEY = { A: 'p1', B: 'p2', C: 'p3' };
 
-  /* Question screens are now Screen 1 (Q1), 2 (Q2), 3 (Q3), 4 (Q4) */
   var NEXT_SCREEN = {
-    1: 'screen-2', // Q1 -> Q2
-    2: 'screen-3', // Q2 -> Q3
-    3: 'screen-4'  // Q3 -> Q4
-    /* Q4 routes to a result screen via pickWinner(scores) */
+    1: 'screen-2',
+    2: 'screen-3',
+    3: 'screen-4'
+    /* Q4 routes to a result via pickWinner(scores) */
   };
 
   var RESULT_SCREEN = {
@@ -732,7 +830,7 @@
   };
 
   /* =================================================================
-     SCREEN TRANSITIONS — fade out 150ms / fade in 300ms
+     SCREEN TRANSITIONS - fade out 150ms / fade in 300ms
      ================================================================= */
   var FADE_OUT_MS = 150;
 
@@ -765,10 +863,7 @@
 
   /* =================================================================
      SCORING + ROUTING
-     ----------------------------------------------------------------
-     Highest score wins. If tied between any profiles, default to p1.
-     Implementation: check p1 first - any tie that includes p1 routes
-     to p1. A pure p2/p3 tie (which excludes p1) routes to p2.
+     If tied between any profiles, default to p1.
      ================================================================= */
   function pickWinner(s) {
     var max = Math.max(s.p1, s.p2, s.p3);
@@ -778,12 +873,12 @@
   }
 
   /* =================================================================
-     QUESTION SCREENS — two modes:
+     QUESTION SCREENS - two modes:
        data-mode="multi"  -> Q1: toggle multiple answers, advance
                              on Next click; every selected letter
                              scores +1 to its profile.
-       data-mode="auto"   -> Q2/Q3/Q4 (default): clicking any answer
-                             scores +1 and immediately advances.
+       (default = "auto") -> Q2/Q3/Q4: clicking any answer scores +1
+                             and immediately advances.
      ================================================================= */
   function advanceFrom(qNum) {
     if (qNum === 4) {
@@ -795,7 +890,7 @@
 
   document.querySelectorAll('.screen[data-question]').forEach(function (screen) {
     var answers = screen.querySelectorAll('.answer');
-    var nextBtn = screen.querySelector('[data-next]'); // present only on multi-select
+    var nextBtn = screen.querySelector('[data-next]');
     var mode    = screen.dataset.mode || 'auto';
     var qNum    = parseInt(screen.dataset.question, 10);
 
@@ -803,11 +898,8 @@
       // -------- MULTI-SELECT (Q1) --------
       answers.forEach(function (btn) {
         btn.addEventListener('click', function () {
-          // Toggle this answer's selected state
           var nowSelected = btn.classList.toggle('is-selected');
-          btn.setAttribute('aria-checked', nowSelected ? 'true' : 'false');
-
-          // Reveal/hide Next based on whether at least one is selected
+          btn.setAttribute('aria-pressed', nowSelected ? 'true' : 'false');
           var anySelected = screen.querySelector('.answer.is-selected');
           if (nextBtn) {
             if (anySelected) {
@@ -831,15 +923,12 @@
         nextBtn.addEventListener('click', function () {
           if (nextBtn.disabled) return;
           var selected = screen.querySelectorAll('.answer.is-selected');
-          if (selected.length === 0) return; // safety: hidden until selection
-
-          // Tally a score for every selected letter
+          if (selected.length === 0) return;
           selected.forEach(function (b) {
             var key = LETTER_TO_KEY[b.dataset.letter];
             if (key) scores[key] += 1;
           });
-
-          nextBtn.disabled = true; // prevent double-click during transition
+          nextBtn.disabled = true;
           advanceFrom(qNum);
         });
       }
@@ -848,17 +937,11 @@
       answers.forEach(function (btn) {
         btn.addEventListener('click', function () {
           if (btn.disabled) return;
-
-          // Lock all answers in this question to prevent double submission
-          // during the fade transition.
           answers.forEach(function (a) { a.disabled = true; });
-
           btn.classList.add('is-selected');
           btn.setAttribute('aria-checked', 'true');
-
           var key = LETTER_TO_KEY[btn.dataset.letter];
           if (key) scores[key] += 1;
-
           advanceFrom(qNum);
         });
 
@@ -873,16 +956,14 @@
   });
 
   /* =================================================================
-     RESULT CTAs — navigate to the registration page.
-     The same URL is used from all three result screens; the
-     destination page handles session selection.
+     RESULT CTAs - navigate to the registration page.
      ================================================================= */
   var REGISTRATION_URL = 'https://aolf.me/the-worry-free-mind';
 
   document.querySelectorAll('[data-result-cta]').forEach(function (btn) {
     btn.addEventListener('click', function () {
       if (btn.disabled) return;
-      btn.disabled = true; // prevent double-click during the brief navigation
+      btn.disabled = true;
       window.location.href = REGISTRATION_URL;
     });
   });
