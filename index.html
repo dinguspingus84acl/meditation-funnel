@@ -896,6 +896,68 @@
     p4: 'screen-5d'
   };
 
+  var PROFILE_NAMES = {
+    p1: 'active_mind',
+    p2: 'driven_doer',
+    p3: 'deep_rest_seeker',
+    p4: 'steady_seeker'
+  };
+
+  /* =================================================================
+     TRACKING
+     ----------------------------------------------------------------
+     Paste your Google Apps Script web-app deployment URL between
+     the quotes below. Leave as '' to disable tracking entirely
+     (the quiz will still work; it just won't log anything).
+     ================================================================= */
+  var TRACKING_URL = 'https://script.google.com/macros/s/AKfycbw64mPJ_H_ItV6gkJ1zdu_WERml-0_8FiSkbWhb49Oegy3dsznWHDXvTzjXSGu-a2Na/exec';
+
+  /* Email from the URL (e.g. ?e=user@example.com from a HubSpot SMS
+     personalization token). Empty string for organic / shared links. */
+  var userEmail = '';
+  try {
+    var sp = new URLSearchParams(window.location.search);
+    userEmail = sp.get('e') || sp.get('email') || '';
+  } catch (e) {}
+
+  /* Per-question answer letters, recorded as the user advances.
+     q1 is an array because Q1 is multi-select; q2/q3/q4 are single
+     letters. */
+  var quizAnswers = { q1: [], q2: '', q3: '', q4: '' };
+
+  /* Fire-and-forget tracking POST. Uses sendBeacon so the request
+     survives any page transitions; falls back to fetch+keepalive. */
+  function sendTracking(profileKey) {
+    if (!TRACKING_URL) return;
+    var payload = {
+      email:        userEmail,
+      q1_answers:   quizAnswers.q1.join(','),
+      q2_answer:    quizAnswers.q2,
+      q3_answer:    quizAnswers.q3,
+      q4_answer:    quizAnswers.q4,
+      profile_code: profileKey,
+      profile_name: PROFILE_NAMES[profileKey] || profileKey,
+      timestamp:    new Date().toISOString(),
+      url:          window.location.href,
+      referrer:     document.referrer || '',
+      user_agent:   navigator.userAgent
+    };
+    var body = JSON.stringify(payload);
+    try {
+      if (navigator.sendBeacon) {
+        var blob = new Blob([body], { type: 'application/json' });
+        if (navigator.sendBeacon(TRACKING_URL, blob)) return;
+      }
+      fetch(TRACKING_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: body,
+        keepalive: true,
+        mode: 'no-cors'
+      }).catch(function () {});
+    } catch (err) { /* silent */ }
+  }
+
   /* =================================================================
      SCREEN TRANSITIONS - fade out 150ms / fade in 300ms
      ================================================================= */
@@ -950,7 +1012,9 @@
      ================================================================= */
   function advanceFrom(qNum) {
     if (qNum === 4) {
-      showScreen(RESULT_SCREEN[pickWinner(scores)]);
+      var winner = pickWinner(scores);
+      sendTracking(winner);
+      showScreen(RESULT_SCREEN[winner]);
     } else {
       showScreen(NEXT_SCREEN[qNum]);
     }
@@ -992,10 +1056,13 @@
           if (nextBtn.disabled) return;
           var selected = screen.querySelectorAll('.answer.is-selected');
           if (selected.length === 0) return;
+          var letters = [];
           selected.forEach(function (b) {
+            letters.push(b.dataset.letter);
             var key = LETTER_TO_KEY[b.dataset.letter];
             if (key) scores[key] += 1;
           });
+          quizAnswers.q1 = letters;
           nextBtn.disabled = true;
           advanceFrom(qNum);
         });
@@ -1010,6 +1077,7 @@
           btn.setAttribute('aria-checked', 'true');
           var key = LETTER_TO_KEY[btn.dataset.letter];
           if (key) scores[key] += 1;
+          quizAnswers['q' + qNum] = btn.dataset.letter;
           advanceFrom(qNum);
         });
 
