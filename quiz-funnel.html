@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>What Kind of Meditator Are You?</title>
+<meta name="description" content="A 60-second quiz to discover your meditation type and what actually fixes the way you struggle.">
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ==============================================================
+     RESET
+     ============================================================== */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  button { font-family: inherit; cursor: pointer; }
+
+  /* ==============================================================
+     DESIGN TOKENS
+     ============================================================== */
+  :root {
+    /* Surfaces */
+    --bg:                  #ffffff;
+    --warm-cream:          #fff5e1;
+    --warm-cream-medium:   rgba(255, 245, 225, 0.75);
+    --warm-cream-soft:     rgba(255, 245, 225, 0.5);
+    --warm-cream-hover:    rgba(255, 245, 225, 0.4);
+    --warm-cream-selected: rgba(255, 245, 225, 0.6);
+
+    /* Blue accents (testimonial cards) */
+    --blue-card-bg:        rgba(61, 139, 232, 0.05);
+    --blue-card-border:    rgba(61, 139, 232, 0.25);
+    --blue-solid:          #3d8be8;
+
+    /* Orange — primary CTA + accent */
+    --orange-cta:          #ff7e00;
+    --orange-cta-hover:    rgb(237, 110, 0);
+    --orange-cta-active:   rgb(220, 95, 0);
+    --orange-accent:       #f7991d;
+    --orange-glow:         rgba(255, 126, 0, 0.35);
+    --orange-glow-hover:   rgba(255, 126, 0, 0.5);
+    --orange-glow-soft:    rgba(255, 126, 0, 0.15);
+    --orange-glow-medium:  rgba(255, 126, 0, 0.2);
+    --orange-tint:         rgba(255, 126, 0, 0.1);
+
+    /* Text + structure */
+    --navy:                #31364e;
+    --deep-purple:         #290d59;
+    --body:                #3f4144;
+    --muted:               #6f7283;
+    --border-soft:         #dcdcdc;
+
+    /* Confirmation success */
+    --success-text:        rgb(30, 120, 60);
+    --success-bg:          rgba(61, 200, 100, 0.08);
+    --success-border:      rgba(61, 200, 100, 0.4);
+
+    /* Type stacks */
+    --serif: "Lora", "Times New Roman", Georgia, serif;
+    --sans:  "Work Sans", Arial, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  /* ==============================================================
+     BASE
+     ============================================================== */
+  body {
+    background: var(--bg);
+    color: var(--body);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+  @media (min-width: 768px) {
+    body { font-size: 18px; }
+  }
+
+  .app {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 24px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  @media (min-width: 768px) {
+    .app { padding: 40px; }
+  }
+
+  /* ==============================================================
+     SCREEN — fade out 150ms / fade in 300ms
+     The default `.screen` rule sets a 150ms transition (used when
+     `is-shown` is removed); `.screen.is-shown` overrides to 300ms.
+     ============================================================== */
+  .screen {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+  .screen.is-visible { display: flex; }
+  .screen.is-shown {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+  }
+
+  /* ==============================================================
+     SCREEN 1 — INTRO + QUESTION 1 (combined)
+     The warm gradient covers the top half; the question section
+     below sits on the white half of the gradient.
+     ============================================================== */
+  #screen-1 {
+    background: linear-gradient(180deg, #fff5e1 0%, #ffffff 50%);
+    margin: -24px -24px 0;
+    padding: 32px 24px 24px;
+  }
+  @media (min-width: 768px) {
+    #screen-1 {
+      margin: -40px -40px 0;
+      padding: 48px 40px 40px;
+    }
+  }
+
+  /* Wordmark + thin centered rule */
+  .wordmark {
+    text-align: center;
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .wordmark::after {
+    content: "";
+    display: block;
+    width: 60px;
+    height: 1px;
+    background: var(--border-soft);
+    margin: 8px auto 24px;
+  }
+
+  /* Intro typography (used only on Screen 1) */
+  .intro-headline {
+    font-family: var(--serif);
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1.3;
+    text-align: center;
+    letter-spacing: -0.005em;
+  }
+  @media (min-width: 768px) {
+    .intro-headline { font-size: 38px; }
+  }
+  .intro-subhead {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 18px;
+    color: var(--orange-accent);
+    text-align: center;
+    margin: 16px auto;
+    line-height: 1.5;
+    max-width: 520px;
+  }
+  .intro-meta {
+    font-family: var(--sans);
+    color: var(--muted);
+    font-size: 13px;
+    text-align: center;
+    margin-bottom: 32px;
+    letter-spacing: 0.02em;
+  }
+
+  /* ==============================================================
+     PROGRESS BAR
+     ============================================================== */
+  .progress { margin-bottom: 24px; }
+  .progress-label {
+    font-family: var(--sans);
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 10px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+  .progress-bar {
+    width: 100%;
+    height: 6px;
+    background: var(--border-soft);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--orange-cta);
+    border-radius: 100px;
+    transition: width 0.4s ease;
+  }
+
+  /* ==============================================================
+     QUESTION TYPOGRAPHY
+     ============================================================== */
+  .question-headline {
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1.3;
+    margin-bottom: 8px;
+    letter-spacing: -0.005em;
+  }
+  @media (min-width: 768px) {
+    .question-headline { font-size: 26px; }
+  }
+  .question-subtext {
+    font-family: var(--sans);
+    color: var(--muted);
+    font-size: 14px;
+    font-style: italic;
+    margin-bottom: 20px;
+  }
+
+  /* ==============================================================
+     ANSWER OPTIONS
+     ============================================================== */
+  .answers {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 24px;
+  }
+  .answer {
+    width: 100%;
+    text-align: left;
+    background: #ffffff;
+    border: 1.5px solid var(--border-soft);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-bottom: 12px;
+    font-family: var(--sans);
+    font-size: 15px;
+    color: var(--body);
+    line-height: 1.6;
+    cursor: pointer;
+    position: relative;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: all 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .answer:last-child { margin-bottom: 0; }
+  .answer:hover {
+    border-color: var(--orange-cta);
+    background: var(--warm-cream-hover);
+    box-shadow: 0 4px 12px var(--orange-glow-soft);
+  }
+  .answer:focus-visible {
+    outline: none;
+    border-color: var(--orange-cta);
+    box-shadow: 0 0 0 3px var(--orange-glow);
+  }
+  .answer.is-selected {
+    border: 2px solid var(--orange-cta);
+    background: var(--warm-cream-selected);
+    box-shadow: 0 4px 12px var(--orange-glow-medium);
+    padding: 17px 49px 17px 19px;
+  }
+  .answer.is-selected::after {
+    content: "✓";
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--orange-cta);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  /* ==============================================================
+     PRIMARY CTA
+     ============================================================== */
+  .cta {
+    display: block;
+    width: 100%;
+    margin: 0;
+    background: var(--orange-cta);
+    color: #ffffff;
+    font-family: var(--sans);
+    font-weight: 700;
+    border: none;
+    border-radius: 100px;
+    padding: 16px 36px;
+    font-size: 18px;
+    box-shadow: 0 4px 16px var(--orange-glow);
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  @media (min-width: 768px) {
+    .cta {
+      width: auto;
+      min-width: 280px;
+      margin: 0 auto;
+      font-size: 20px;
+    }
+  }
+  .cta:hover {
+    background: var(--orange-cta-hover);
+    box-shadow: 0 6px 20px var(--orange-glow-hover);
+  }
+  .cta:active {
+    background: var(--orange-cta-active);
+    transform: scale(0.98);
+  }
+  .cta:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 126, 0, 0.4), 0 4px 16px var(--orange-glow);
+  }
+  .cta:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+  .cta.is-hidden { display: none; }
+
+  /* ==============================================================
+     PROFILE BADGE
+     ============================================================== */
+  .badge-wrap { text-align: center; }
+  .profile-badge {
+    display: inline-block;
+    background: var(--orange-tint);
+    border: 1.5px solid var(--orange-cta);
+    color: var(--orange-cta);
+    padding: 6px 18px;
+    border-radius: 100px;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 20px;
+  }
+
+  /* ==============================================================
+     RESULT TYPOGRAPHY
+     ============================================================== */
+  .result-headline {
+    font-family: var(--serif);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1.3;
+    text-align: center;
+    margin-bottom: 24px;
+    letter-spacing: -0.005em;
+  }
+  @media (min-width: 768px) {
+    .result-headline { font-size: 34px; }
+  }
+  .result-body p {
+    font-family: var(--sans);
+    color: var(--body);
+    font-size: 15px;
+    line-height: 1.7;
+    margin-bottom: 16px;
+  }
+  @media (min-width: 768px) {
+    .result-body p { font-size: 17px; }
+  }
+  .result-body blockquote {
+    border: none;
+    background: none;
+    padding: 0;
+    margin: 24px 0;
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 600;
+    font-size: 17px;
+    color: var(--orange-accent);
+    line-height: 1.7;
+  }
+  @media (min-width: 768px) {
+    .result-body blockquote { font-size: 19px; }
+  }
+
+  /* ==============================================================
+     TESTIMONIAL CARDS
+     ============================================================== */
+  .testimonials { margin: 24px 0; }
+  .testimonial {
+    background: var(--blue-card-bg);
+    border: 1.5px solid var(--blue-card-border);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+  }
+  .testimonial:last-of-type { margin-bottom: 0; }
+  .quote-pair { margin-bottom: 18px; }
+  .quote-pair:last-child { margin-bottom: 0; }
+  .quote-pair .quote {
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--body);
+    font-size: 15px;
+    line-height: 1.7;
+    margin-bottom: 8px;
+  }
+  .quote-pair .attrib {
+    font-family: var(--sans);
+    font-weight: 700;
+    color: var(--navy);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ==============================================================
+     BRIDGE COPY
+     ============================================================== */
+  .bridge {
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--muted);
+    font-size: 15px;
+    text-align: center;
+    line-height: 1.7;
+    margin: 24px auto 16px;
+    max-width: 560px;
+  }
+
+  /* ==============================================================
+     CONFIRMATION (post-CTA)
+     ============================================================== */
+  .confirmation {
+    background: var(--success-bg);
+    border: 1.5px solid var(--success-border);
+    color: var(--success-text);
+    padding: 16px 20px;
+    border-radius: 12px;
+    text-align: center;
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.55;
+    margin-top: 16px;
+  }
+  @media (min-width: 768px) {
+    .confirmation {
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+
+  /* ==============================================================
+     FOOTER (result pages)
+     ============================================================== */
+  .footer {
+    font-family: var(--sans);
+    color: var(--muted);
+    font-size: 12px;
+    text-align: center;
+    padding: 24px 0 32px;
+    margin-top: 32px;
+    border-top: 1px solid var(--border-soft);
+  }
+
+  /* ==============================================================
+     MOBILE TUNING
+     ============================================================== */
+  @media (max-width: 480px) {
+    .intro-headline { font-size: 28px; }
+    .intro-subhead { font-size: 17px; }
+    .question-headline { font-size: 20px; }
+    .result-headline { font-size: 24px; }
+    .answer { font-size: 15px; }
+    .testimonial { padding: 20px 22px; }
+    .result-body blockquote { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ==============================================================
+       SCREEN 1 — INTRO + QUESTION 1 (combined)
+       ============================================================== -->
+  <section class="screen is-visible is-shown" id="screen-1" data-question="1" data-mode="multi" aria-labelledby="introHeadline">
+    <p class="wordmark">THE ART OF LIVING</p>
+    <h1 class="intro-headline" id="introHeadline">What Kind of Meditator Are You?</h1>
+    <p class="intro-subhead">Find out why you struggle - and what actually fixes it.</p>
+    <p class="intro-meta">60 seconds &middot; No email required &middot; Instant results</p>
+
+    <div class="progress">
+      <p class="progress-label">Question 1 of 4</p>
+      <div class="progress-bar"><div class="progress-fill" style="width: 25%;"></div></div>
+    </div>
+    <h2 class="question-headline" id="q1">Which of these have you actually tried?</h2>
+    <p class="question-subtext">Select all that apply.</p>
+    <div class="answers" role="radiogroup" aria-labelledby="q1">
+      <button type="button" class="answer" data-letter="A" role="radio" aria-checked="false">Meditation apps - downloaded, used for a week or two, gave up after it didn't stick.</button>
+      <button type="button" class="answer" data-letter="B" role="radio" aria-checked="false">YouTube guided meditations - work sometimes, but I can never stay consistent with it.</button>
+      <button type="button" class="answer" data-letter="C" role="radio" aria-checked="false">Breathing exercises, box breath, positive thinking - they help a little, but not enough.</button>
+    </div>
+    <button type="button" class="cta is-hidden" data-next>Next &rarr;</button>
+  </section>
+
+  <!-- ==============================================================
+       SCREEN 2 — QUESTION 2
+       ============================================================== -->
+  <section class="screen" id="screen-2" data-question="2" aria-labelledby="q2">
+    <div class="progress">
+      <p class="progress-label">Question 2 of 4</p>
+      <div class="progress-bar"><div class="progress-fill" style="width: 50%;"></div></div>
+    </div>
+    <h2 class="question-headline" id="q2">When you close your eyes and try to relax, what actually happens?</h2>
+    <p class="question-subtext">Select the one that fits best.</p>
+    <div class="answers" role="radiogroup" aria-labelledby="q2">
+      <button type="button" class="answer" data-letter="A" role="radio" aria-checked="false">My mind immediately starts racing. I'm replaying conversations, running through my to-do list, worrying about things I can't control. The 3 AM worry spirals don't stop even when I try to rest.</button>
+      <button type="button" class="answer" data-letter="B" role="radio" aria-checked="false">I get physically restless. Sitting still feels like falling behind. I keep thinking about everything I should be doing instead.</button>
+      <button type="button" class="answer" data-letter="C" role="radio" aria-checked="false">I feel foggy or numb. I'm so exhausted that mental exhaustion has become my baseline. I'm not anxious - I'm just depleted.</button>
+    </div>
+  </section>
+
+  <!-- ==============================================================
+       SCREEN 3 — QUESTION 3
+       ============================================================== -->
+  <section class="screen" id="screen-3" data-question="3" aria-labelledby="q3">
+    <div class="progress">
+      <p class="progress-label">Question 3 of 4</p>
+      <div class="progress-bar"><div class="progress-fill" style="width: 75%;"></div></div>
+    </div>
+    <h2 class="question-headline" id="q3">Which of these sounds most like your internal experience right now?</h2>
+    <p class="question-subtext">Select the one that fits best.</p>
+    <div class="answers" role="radiogroup" aria-labelledby="q3">
+      <button type="button" class="answer" data-letter="A" role="radio" aria-checked="false">"My worries are wearing out my inner peace." I feel like I can never fully switch off.</button>
+      <button type="button" class="answer" data-letter="B" role="radio" aria-checked="false">I'm running on fumes. I keep pushing through but I can feel myself getting more reactive, more brittle, less like myself.</button>
+      <button type="button" class="answer" data-letter="C" role="radio" aria-checked="false">I read this and felt something: "I've not ever experienced that depth of myself before." I want that. I just don't know how to get there.</button>
+    </div>
+  </section>
+
+  <!-- ==============================================================
+       SCREEN 4 — QUESTION 4
+       ============================================================== -->
+  <section class="screen" id="screen-4" data-question="4" aria-labelledby="q4">
+    <div class="progress">
+      <p class="progress-label">Question 4 of 4</p>
+      <div class="progress-bar"><div class="progress-fill" style="width: 100%;"></div></div>
+    </div>
+    <h2 class="question-headline" id="q4">What would it mean to you if you could finally meditate - actually meditate, not just sit there?</h2>
+    <p class="question-subtext">Select the one that fits best.</p>
+    <div class="answers" role="radiogroup" aria-labelledby="q4">
+      <button type="button" class="answer" data-letter="A" role="radio" aria-checked="false">I could stop fighting my own mind. For the first time in my life, I could clear my head fully.</button>
+      <button type="button" class="answer" data-letter="B" role="radio" aria-checked="false">I would feel grounded. Calmer, steadier, more hopeful. Less anxiety. More energy. Actually present in my own life.</button>
+      <button type="button" class="answer" data-letter="C" role="radio" aria-checked="false">I would feel genuinely rested. Not just less tired - restored. Like my whole demeanor has shifted to calm.</button>
+    </div>
+  </section>
+
+  <!-- ==============================================================
+       SCREEN 5A — RESULT: THE ACTIVE MIND
+       ============================================================== -->
+  <section class="screen" id="screen-5a" aria-labelledby="result-a-headline">
+    <div class="badge-wrap"><span class="profile-badge">Your Type: The Active Mind</span></div>
+    <h2 class="result-headline" id="result-a-headline">You're Not Bad at Meditation. You Were Never Taught How.</h2>
+
+    <div class="result-body">
+      <p>You've tried the apps. You've watched the YouTube videos. You've sat down, closed your eyes, and told yourself to relax - and within thirty seconds your brain was already three steps ahead, replaying a conversation from last week or running through everything that could go wrong tomorrow.</p>
+
+      <p>At some point you probably concluded that you're just not a "meditation person." That your mind is too busy. That this works for everyone else but not for you.</p>
+
+      <blockquote>"Your mind isn't designed to 'clear itself' through willpower. It's designed to think, analyze, worry, plan, and ruminate. That's its job. Telling yourself to 'stop thinking' is like telling your heart to stop beating. It doesn't work that way."</blockquote>
+
+      <p>Most meditation instruction tells you to "focus on your breath," "let thoughts pass like clouds," "clear your mind." These aren't techniques. They're descriptions of what meditation feels like after you already know how to do it. It's like asking someone to play the piano beautifully without teaching them which keys to play.</p>
+
+      <p>The apps made it worse. They rented you relaxation for 10 minutes. Then your racing thoughts came back. So you opened the app again the next day. And you never actually learned a technique.</p>
+
+      <p>What you need is an approach that doesn't ask you to stop your thoughts. You need a practice that gives your mind something to settle into naturally - allowing the mental noise to quiet on its own, without a fight. People with the busiest minds often get the deepest meditations when they finally learn how to work with their biology instead of against it.</p>
+    </div>
+
+    <div class="testimonials">
+      <div class="testimonial">
+        <div class="quote-pair">
+          <p class="quote">"My worries were wearing out my inner peace."</p>
+          <p class="attrib">- Rob T. (before)</p>
+        </div>
+        <div class="quote-pair">
+          <p class="quote">"Yes. I am sleeping and my demeanor has shifted to calm. Focus, drastically improved."</p>
+          <p class="attrib">- Rob T. (after)</p>
+        </div>
+      </div>
+
+      <div class="testimonial">
+        <div class="quote-pair">
+          <p class="quote">"For the first time in my life I am able to relax without racing thoughts or worries wearing out my inner peace and gained energy from actually being able to stay still and clear my mind fully. I've not ever experienced that depth of myself before."</p>
+          <p class="attrib">- Brandy D.</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="bridge">"We're hosting a series of free live sessions led by senior Art of Living teachers - covering everything from the simplest steps to get started, to the ancient wisdom behind the practice, to the science of what it actually does to your mind and body. Pick the session that speaks to you."</p>
+
+    <button type="button" class="cta" data-result-cta>Choose My Free Session &rarr;</button>
+    <div class="confirmation" hidden>&check; You're on the list. Check your texts within the next hour for your personal invite.</div>
+
+    <p class="footer">&copy; 2026 Art of Living Foundation &middot; All rights reserved</p>
+  </section>
+
+  <!-- ==============================================================
+       SCREEN 5B — RESULT: THE DRIVEN DOER
+       ============================================================== -->
+  <section class="screen" id="screen-5b" aria-labelledby="result-b-headline">
+    <div class="badge-wrap"><span class="profile-badge">Your Type: The Driven Doer</span></div>
+    <h2 class="result-headline" id="result-b-headline">Relaxation Shouldn't Feel Like an Internal Battle.</h2>
+
+    <div class="result-body">
+      <p>You're not burned out because you work too hard. You're burned out because the tools you've been given to recover from hard work aren't actually working.</p>
+
+      <p>Guided meditation apps feel passive and slow. You're following someone else's voice through a body scan while your brain is already three steps ahead planning tomorrow. You're consuming their meditation - not learning your own. And the moment you close the app, the restlessness returns.</p>
+
+      <blockquote>"They're not teaching you meditation. They're renting you relaxation."</blockquote>
+
+      <p>What you need isn't a relaxation tool. It's a self-sufficient practice you own completely - no app, no subscription, no guided voice, no wondering if you're doing it right.</p>
+
+      <p>You need a technique that takes 20 minutes, that you learn once from a trained teacher, and that you can practice independently for the rest of your life. No dependency. No endless content library. You learn the technique once. Then it's yours forever.</p>
+
+      <p>The research backs this up. A randomized controlled trial at Western University and McGill University found that this specific approach produced improvements in executive function, sleep quality, and anxiety - with benefits that persisted at the 26-week follow-up. This isn't experimental wellness.</p>
+    </div>
+
+    <div class="testimonials">
+      <div class="testimonial">
+        <div class="quote-pair">
+          <p class="quote">"After starting my meditation practices, I realized I had been taking medication for ADHD for 25 years. Since practicing breath work and meditation, I have stopped taking medication and have begun painting again. My whole life has changed."</p>
+          <p class="attrib">- Catherine P.</p>
+        </div>
+      </div>
+
+      <div class="testimonial">
+        <div class="quote-pair">
+          <p class="quote">"I absolutely have realized positive effects in my life. I feel calmer, steadier and more hopeful! I have less anxiety and more energy. My sleep has also improved."</p>
+          <p class="attrib">- Janet P.</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="bridge">"We're hosting a series of free live sessions led by senior Art of Living teachers - from the science of meditation and performance, to simple steps for beginners, to the deeper ancient wisdom behind the practice. One hour, completely free. Find the session that fits your schedule and your style."</p>
+
+    <button type="button" class="cta" data-result-cta>Choose My Free Session &rarr;</button>
+    <div class="confirmation" hidden>&check; You're on the list. Check your texts within the next hour for your personal invite.</div>
+
+    <p class="footer">&copy; 2026 Art of Living Foundation &middot; All rights reserved</p>
+  </section>
+
+  <!-- ==============================================================
+       SCREEN 5C — RESULT: THE DEEP REST SEEKER
+       ============================================================== -->
+  <section class="screen" id="screen-5c" aria-labelledby="result-c-headline">
+    <div class="badge-wrap"><span class="profile-badge">Your Type: The Deep Rest Seeker</span></div>
+    <h2 class="result-headline" id="result-c-headline">You Don't Need More Sleep. You Need a Different Kind of Rest.</h2>
+
+    <div class="result-body">
+      <p>You can sleep eight hours and wake up exhausted. You can do everything right - the early bedtime, the screen limits, the breathing exercises - and still feel like you're running on empty. Mental exhaustion has become your baseline.</p>
+
+      <p>This isn't a willpower problem. And it's not because you're doing something wrong.</p>
+
+      <blockquote>"Your mind isn't designed to 'clear itself' through willpower. It's designed to think, analyze, worry, plan, and ruminate. That's its job. Telling yourself to 'stop thinking' is like telling your heart to stop beating."</blockquote>
+
+      <p>Sleep rests the body. But it doesn't clear the deeper layers of tension, anxiety, and emotional weight that accumulate over time. That backlog is what you feel when you wake up tired despite having slept. It's what makes silence feel uncomfortable rather than restorative.</p>
+
+      <p>What you need is a technique that creates a state of rest that is often deeper than sleep - allowing the nervous system to finally discharge what it's been carrying. A randomized controlled trial at Western University and McGill University found a 40% remission rate for depression (vs. 16.3% in the active control group), with improvements in sleep quality, anxiety, and executive function that persisted at the 26-week follow-up.</p>
+
+      <p>You don't need more sleep. You need a different kind of rest. And you can learn the technique in 3 days.</p>
+    </div>
+
+    <div class="testimonials">
+      <div class="testimonial">
+        <div class="quote-pair">
+          <p class="quote">"This is the deepest meditation I have experienced. I practice meditation regularly, almost daily. I am living a happier lifestyle, emotionally."</p>
+          <p class="attrib">- Judy G.</p>
+        </div>
+      </div>
+
+      <div class="testimonial">
+        <div class="quote-pair">
+          <p class="quote">"Profound shifts. More peace, joy, contentment, and spiritually connected."</p>
+          <p class="attrib">- Laura B.</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="bridge">"We're hosting a series of free live sessions led by senior Art of Living teachers - exploring the ancient wisdom behind this practice, the science of deep rest, and simple ways to finally make meditation your own. All free. All live. Find the one that feels right."</p>
+
+    <button type="button" class="cta" data-result-cta>Choose My Free Session &rarr;</button>
+    <div class="confirmation" hidden>&check; You're on the list. Check your texts within the next hour for your personal invite.</div>
+
+    <p class="footer">&copy; 2026 Art of Living Foundation &middot; All rights reserved</p>
+  </section>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* =================================================================
+     STATE
+     ----------------------------------------------------------------
+     Three-profile score object as specified:
+       p1 = The Active Mind        (answer A)
+       p2 = The Driven Doer        (answer B)
+       p3 = The Deep Rest Seeker   (answer C)
+     ================================================================= */
+  var scores = { p1: 0, p2: 0, p3: 0 };
+
+  var LETTER_TO_KEY = { A: 'p1', B: 'p2', C: 'p3' };
+
+  /* Question screens are now Screen 1 (Q1), 2 (Q2), 3 (Q3), 4 (Q4) */
+  var NEXT_SCREEN = {
+    1: 'screen-2', // Q1 -> Q2
+    2: 'screen-3', // Q2 -> Q3
+    3: 'screen-4'  // Q3 -> Q4
+    /* Q4 routes to a result screen via pickWinner(scores) */
+  };
+
+  var RESULT_SCREEN = {
+    p1: 'screen-5a',
+    p2: 'screen-5b',
+    p3: 'screen-5c'
+  };
+
+  /* =================================================================
+     SCREEN TRANSITIONS — fade out 150ms / fade in 300ms
+     ================================================================= */
+  var FADE_OUT_MS = 150;
+
+  function showScreen(targetId) {
+    var current = document.querySelector('.screen.is-shown');
+    var target  = document.getElementById(targetId);
+    if (!target || current === target) return;
+
+    if (current) {
+      current.classList.remove('is-shown');
+      window.setTimeout(function () {
+        current.classList.remove('is-visible');
+        activate(target);
+      }, FADE_OUT_MS);
+    } else {
+      activate(target);
+    }
+  }
+
+  function activate(target) {
+    window.scrollTo(0, 0);
+    target.classList.add('is-visible');
+    /* Force reflow so .is-shown opacity transition fires from 0 -> 1. */
+    /* eslint-disable-next-line no-unused-expressions */
+    target.offsetWidth;
+    window.requestAnimationFrame(function () {
+      target.classList.add('is-shown');
+    });
+  }
+
+  /* =================================================================
+     SCORING + ROUTING
+     ----------------------------------------------------------------
+     Highest score wins. If tied between any profiles, default to p1.
+     Implementation: check p1 first - any tie that includes p1 routes
+     to p1. A pure p2/p3 tie (which excludes p1) routes to p2.
+     ================================================================= */
+  function pickWinner(s) {
+    var max = Math.max(s.p1, s.p2, s.p3);
+    if (s.p1 === max) return 'p1';
+    if (s.p2 === max) return 'p2';
+    return 'p3';
+  }
+
+  /* =================================================================
+     QUESTION SCREENS — two modes:
+       data-mode="multi"  -> Q1: toggle multiple answers, advance
+                             on Next click; every selected letter
+                             scores +1 to its profile.
+       data-mode="auto"   -> Q2/Q3/Q4 (default): clicking any answer
+                             scores +1 and immediately advances.
+     ================================================================= */
+  function advanceFrom(qNum) {
+    if (qNum === 4) {
+      showScreen(RESULT_SCREEN[pickWinner(scores)]);
+    } else {
+      showScreen(NEXT_SCREEN[qNum]);
+    }
+  }
+
+  document.querySelectorAll('.screen[data-question]').forEach(function (screen) {
+    var answers = screen.querySelectorAll('.answer');
+    var nextBtn = screen.querySelector('[data-next]'); // present only on multi-select
+    var mode    = screen.dataset.mode || 'auto';
+    var qNum    = parseInt(screen.dataset.question, 10);
+
+    if (mode === 'multi') {
+      // -------- MULTI-SELECT (Q1) --------
+      answers.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          // Toggle this answer's selected state
+          var nowSelected = btn.classList.toggle('is-selected');
+          btn.setAttribute('aria-checked', nowSelected ? 'true' : 'false');
+
+          // Reveal/hide Next based on whether at least one is selected
+          var anySelected = screen.querySelector('.answer.is-selected');
+          if (nextBtn) {
+            if (anySelected) {
+              nextBtn.classList.remove('is-hidden');
+              nextBtn.disabled = false;
+            } else {
+              nextBtn.classList.add('is-hidden');
+            }
+          }
+        });
+
+        btn.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            this.click();
+          }
+        });
+      });
+
+      if (nextBtn) {
+        nextBtn.addEventListener('click', function () {
+          if (nextBtn.disabled) return;
+          var selected = screen.querySelectorAll('.answer.is-selected');
+          if (selected.length === 0) return; // safety: hidden until selection
+
+          // Tally a score for every selected letter
+          selected.forEach(function (b) {
+            var key = LETTER_TO_KEY[b.dataset.letter];
+            if (key) scores[key] += 1;
+          });
+
+          nextBtn.disabled = true; // prevent double-click during transition
+          advanceFrom(qNum);
+        });
+      }
+    } else {
+      // -------- AUTO-SUBMIT (Q2, Q3, Q4) --------
+      answers.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          if (btn.disabled) return;
+
+          // Lock all answers in this question to prevent double submission
+          // during the fade transition.
+          answers.forEach(function (a) { a.disabled = true; });
+
+          btn.classList.add('is-selected');
+          btn.setAttribute('aria-checked', 'true');
+
+          var key = LETTER_TO_KEY[btn.dataset.letter];
+          if (key) scores[key] += 1;
+
+          advanceFrom(qNum);
+        });
+
+        btn.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            this.click();
+          }
+        });
+      });
+    }
+  });
+
+  /* =================================================================
+     RESULT CTAs — navigate to the registration page.
+     The same URL is used from all three result screens; the
+     destination page handles session selection.
+     ================================================================= */
+  var REGISTRATION_URL = 'https://aolf.me/the-worry-free-mind';
+
+  document.querySelectorAll('[data-result-cta]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (btn.disabled) return;
+      btn.disabled = true; // prevent double-click during the brief navigation
+      window.location.href = REGISTRATION_URL;
+    });
+  });
+})();
+</script>
+</body>
+</html>
