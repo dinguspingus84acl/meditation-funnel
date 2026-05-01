@@ -564,27 +564,25 @@
   </section>
 
   <!-- ==============================================================
-       SCREEN 2 - QUESTION 2 (multi-select with Next button)
-       Restored from the original Q1.
+       SCREEN 2 - QUESTION 2 (single-select auto-advance)
        ============================================================== -->
-  <section class="screen" id="screen-2" data-question="2" data-mode="multi" aria-labelledby="q2">
+  <section class="screen" id="screen-2" data-question="2" aria-labelledby="q2">
     <div class="progress">
       <p class="progress-label">Question 2 of 4</p>
       <div class="progress-bar"><div class="progress-fill" style="width: 50%;"></div></div>
     </div>
     <h2 class="question-headline" id="q2">Which of these have you actually tried?</h2>
-    <p class="question-subtext">Select all that apply.</p>
-    <div class="answers" role="group" aria-labelledby="q2">
-      <button type="button" class="answer" data-letter="A" aria-pressed="false">Meditation apps - downloaded, used for a week or two, gave up after it didn't stick.</button>
-      <button type="button" class="answer" data-letter="B" aria-pressed="false">YouTube guided meditations - work sometimes, but I can never stay consistent with it.</button>
-      <button type="button" class="answer" data-letter="C" aria-pressed="false">Breathing exercises, box breath, positive thinking - they help a little, but not enough.</button>
-      <button type="button" class="answer" data-letter="D" aria-pressed="false">I've had positive experiences with meditation and I want to take it further.</button>
+    <p class="question-subtext">Select the one that fits best.</p>
+    <div class="answers" role="radiogroup" aria-labelledby="q2">
+      <button type="button" class="answer" data-letter="A" role="radio" aria-checked="false">Meditation apps - downloaded, used for a week or two, gave up after it didn't stick.</button>
+      <button type="button" class="answer" data-letter="B" role="radio" aria-checked="false">YouTube guided meditations - work sometimes, but I can never stay consistent with it.</button>
+      <button type="button" class="answer" data-letter="C" role="radio" aria-checked="false">Breathing exercises, box breath, positive thinking - they help a little, but not enough.</button>
+      <button type="button" class="answer" data-letter="D" role="radio" aria-checked="false">I've had positive experiences with meditation and I want to take it further.</button>
     </div>
-    <button type="button" class="cta is-hidden" data-next>Next &rarr;</button>
   </section>
 
   <!-- ==============================================================
-       SCREEN 3 - QUESTION 3 (auto-submit on tap)
+       SCREEN 3 - QUESTION 3 (single-select auto-advance)
        ============================================================== -->
   <section class="screen" id="screen-3" data-question="3" aria-labelledby="q3">
     <div class="progress">
@@ -602,7 +600,7 @@
   </section>
 
   <!-- ==============================================================
-       SCREEN 4 - QUESTION 4 (auto-submit on tap, final question)
+       SCREEN 4 - QUESTION 4 (single-select auto-advance, final)
        ============================================================== -->
   <section class="screen" id="screen-4" data-question="4" aria-labelledby="q4">
     <div class="progress">
@@ -923,9 +921,10 @@
   } catch (e) {}
 
   /* Per-question answer letters, recorded as the user advances.
-     All values are stored as strings. Multi-select answers are
-     comma-joined (e.g. "A,D"). Single-select answers are a single
-     letter (e.g. "B"). */
+     All values are strings. (Multi-select handler exists in the
+     code but is currently unused; would comma-join into the same
+     string slot if reactivated by adding data-mode="multi" to a
+     question screen.) */
   var quizAnswers = { q1: '', q2: '', q3: '', q4: '' };
 
   /* Fire-and-forget tracking POST.
@@ -1017,11 +1016,13 @@
 
   /* =================================================================
      QUESTION SCREENS - two modes:
-       data-mode="multi"  -> Q1: toggle multiple answers, advance
-                             on Next click; every selected letter
-                             scores +1 to its profile.
-       (default = "auto") -> Q2/Q3/Q4: clicking any answer scores +1
-                             and immediately advances.
+       data-mode="multi"  -> toggle multiple answers, advance on Next
+                             click; every selected letter scores +1.
+                             (Currently unused; no question screen
+                             carries this attribute. Handler kept in
+                             place for easy re-enable.)
+       (default = "auto") -> clicking any answer scores +1 and
+                             immediately advances. Used by Q1, Q2, Q3.
      ================================================================= */
   function advanceFrom(qNum) {
     if (qNum === 4) {
@@ -1040,7 +1041,7 @@
     var qNum    = parseInt(screen.dataset.question, 10);
 
     if (mode === 'multi') {
-      // -------- MULTI-SELECT (Q2) --------
+      // -------- MULTI-SELECT (currently unused; preserved for re-enable) --------
       answers.forEach(function (btn) {
         btn.addEventListener('click', function () {
           var nowSelected = btn.classList.toggle('is-selected');
@@ -1081,7 +1082,7 @@
         });
       }
     } else {
-      // -------- AUTO-SUBMIT (Q1, Q3, Q4) --------
+      // -------- AUTO-SUBMIT (Q1, Q2, Q3, Q4) --------
       answers.forEach(function (btn) {
         btn.addEventListener('click', function () {
           if (btn.disabled) return;
