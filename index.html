@@ -896,9 +896,8 @@
   } catch (e) {}
 
   /* Per-question answer letters, recorded as the user advances.
-     q1 is an array because Q1 is multi-select; q2/q3/q4 are single
-     letters. */
-  var quizAnswers = { q1: [], q2: '', q3: '', q4: '' };
+     All single-select strings now that the quiz is 3 questions. */
+  var quizAnswers = { q1: '', q2: '', q3: '' };
 
   /* Fire-and-forget tracking POST.
      Important: Apps Script web apps don't handle CORS preflight, so
@@ -909,10 +908,9 @@
     if (!TRACKING_URL) return;
     var payload = {
       email:        userEmail,
-      q1_answers:   quizAnswers.q1.join(','),
+      q1_answers:   quizAnswers.q1,
       q2_answer:    quizAnswers.q2,
       q3_answer:    quizAnswers.q3,
-      q4_answer:    quizAnswers.q4,
       profile_code: profileKey,
       profile_name: PROFILE_NAMES[profileKey] || profileKey,
       timestamp:    new Date().toISOString(),
