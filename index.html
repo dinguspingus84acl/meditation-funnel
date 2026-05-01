@@ -135,36 +135,31 @@
     margin: 8px auto 24px;
   }
 
-  .intro-headline {
-    font-family: var(--serif);
-    font-size: 30px;
-    font-weight: 700;
+  /* Intro typography - "Quick meditation quiz" redesign.
+     Sans-serif (Work Sans), left-aligned, 600 weight on the headline. */
+  .intro-quiz-headline {
+    font-family: var(--sans);
+    font-size: 24px;
+    font-weight: 600;
     color: var(--navy);
     line-height: 1.3;
-    text-align: center;
+    text-align: left;
     letter-spacing: -0.005em;
   }
   @media (min-width: 768px) {
-    .intro-headline { font-size: 38px; }
+    .intro-quiz-headline { font-size: 28px; }
   }
-  .intro-subhead {
-    font-family: var(--serif);
-    font-style: italic;
-    font-weight: 400;
-    font-size: 18px;
-    color: var(--orange-accent);
-    text-align: center;
-    margin: 16px auto;
-    line-height: 1.5;
-    max-width: 520px;
-  }
-  .intro-meta {
+  .intro-quiz-body {
     font-family: var(--sans);
-    color: var(--muted);
-    font-size: 13px;
-    text-align: center;
-    margin-bottom: 32px;
-    letter-spacing: 0.02em;
+    color: var(--body);
+    font-size: 16px;
+    line-height: 1.6;
+    text-align: left;
+    margin-top: 16px;
+    margin-bottom: 28px;
+  }
+  @media (min-width: 768px) {
+    .intro-quiz-body { margin-bottom: 32px; }
   }
 
   /* ==============================================================
@@ -525,8 +520,8 @@
      MOBILE TUNING
      ============================================================== */
   @media (max-width: 480px) {
-    .intro-headline { font-size: 28px; }
-    .intro-subhead { font-size: 17px; }
+    .intro-quiz-headline { font-size: 22px; }
+    .intro-quiz-body { font-size: 15px; }
     .question-headline { font-size: 20px; }
     .result-headline { font-size: 24px; }
     .answer { font-size: 15px; }
@@ -540,58 +535,38 @@
 <div class="app">
 
   <!-- ==============================================================
-       SCREEN 1 - INTRO + QUESTION 1 (multi-select)
+       SCREEN 1 - INTRO + QUESTION 1 (auto-advance, single-select)
        ============================================================== -->
-  <section class="screen is-visible is-shown" id="screen-1" data-question="1" data-mode="multi" aria-labelledby="introHeadline">
+  <section class="screen is-visible is-shown" id="screen-1" data-question="1" aria-labelledby="introHeadline">
     <p class="wordmark">THE ART OF LIVING</p>
-    <h1 class="intro-headline" id="introHeadline">What Kind of Meditator Are You?</h1>
-    <p class="intro-subhead">Find out why you struggle - and what actually fixes it.</p>
-    <p class="intro-meta">60 seconds &middot; No email required &middot; Instant results</p>
+    <h1 class="intro-quiz-headline" id="introHeadline">Quick meditation quiz.</h1>
+    <p class="intro-quiz-body">Three questions, about 60 seconds. You'll get your meditator type at the end.</p>
 
     <div class="progress">
-      <p class="progress-label">Question 1 of 4</p>
-      <div class="progress-bar"><div class="progress-fill" style="width: 25%;"></div></div>
+      <p class="progress-label">Question 1 of 3</p>
+      <div class="progress-bar"><div class="progress-fill" style="width: 33%;"></div></div>
     </div>
-    <h2 class="question-headline" id="q1">Which of these have you actually tried?</h2>
-    <p class="question-subtext">Select all that apply.</p>
-    <div class="answers" role="group" aria-labelledby="q1">
-      <button type="button" class="answer" data-letter="A" aria-pressed="false">Meditation apps - downloaded, used for a week or two, gave up after it didn't stick.</button>
-      <button type="button" class="answer" data-letter="B" aria-pressed="false">YouTube guided meditations - work sometimes, but I can never stay consistent with it.</button>
-      <button type="button" class="answer" data-letter="C" aria-pressed="false">Breathing exercises, box breath, positive thinking - they help a little, but not enough.</button>
-      <button type="button" class="answer" data-letter="D" aria-pressed="false">I've had positive experiences with meditation and I want to take it further.</button>
+    <h2 class="question-headline" id="q1">When you close your eyes and try to meditate, what actually happens?</h2>
+    <div class="answers" role="radiogroup" aria-labelledby="q1">
+      <button type="button" class="answer" data-letter="A" role="radio" aria-checked="false">My mind races. Conversations replay, tomorrow's to-do list shows up uninvited.</button>
+      <button type="button" class="answer" data-letter="B" role="radio" aria-checked="false">I get restless. Sitting still feels like I'm falling behind on something.</button>
+      <button type="button" class="answer" data-letter="C" role="radio" aria-checked="false">I feel foggy and depleted. Not anxious, just empty.</button>
+      <button type="button" class="answer" data-letter="D" role="radio" aria-checked="false">I can settle, but I sense there's a deeper place I'm not quite reaching.</button>
     </div>
-    <button type="button" class="cta is-hidden" data-next>Next &rarr;</button>
   </section>
 
   <!-- ==============================================================
        SCREEN 2 - QUESTION 2 (auto-submit on tap)
+       (Was QUESTION 3 in the prior structure.)
        ============================================================== -->
   <section class="screen" id="screen-2" data-question="2" aria-labelledby="q2">
     <div class="progress">
-      <p class="progress-label">Question 2 of 4</p>
-      <div class="progress-bar"><div class="progress-fill" style="width: 50%;"></div></div>
+      <p class="progress-label">Question 2 of 3</p>
+      <div class="progress-bar"><div class="progress-fill" style="width: 66%;"></div></div>
     </div>
-    <h2 class="question-headline" id="q2">When you close your eyes and try to relax, what actually happens?</h2>
+    <h2 class="question-headline" id="q2">Which of these sounds most like your internal experience right now?</h2>
     <p class="question-subtext">Select the one that fits best.</p>
     <div class="answers" role="radiogroup" aria-labelledby="q2">
-      <button type="button" class="answer" data-letter="A" role="radio" aria-checked="false">My mind immediately starts racing. I'm replaying conversations, running through my to-do list, worrying about things I can't control. The 3 AM worry spirals don't stop even when I try to rest.</button>
-      <button type="button" class="answer" data-letter="B" role="radio" aria-checked="false">I get physically restless. Sitting still feels like falling behind. I keep thinking about everything I should be doing instead.</button>
-      <button type="button" class="answer" data-letter="C" role="radio" aria-checked="false">I feel foggy or numb. I'm so exhausted that mental exhaustion has become my baseline. I'm not anxious - I'm just depleted.</button>
-      <button type="button" class="answer" data-letter="D" role="radio" aria-checked="false">I can settle, but not as deeply as I sense is possible. Something quieter is there, just out of reach.</button>
-    </div>
-  </section>
-
-  <!-- ==============================================================
-       SCREEN 3 - QUESTION 3 (auto-submit on tap)
-       ============================================================== -->
-  <section class="screen" id="screen-3" data-question="3" aria-labelledby="q3">
-    <div class="progress">
-      <p class="progress-label">Question 3 of 4</p>
-      <div class="progress-bar"><div class="progress-fill" style="width: 75%;"></div></div>
-    </div>
-    <h2 class="question-headline" id="q3">Which of these sounds most like your internal experience right now?</h2>
-    <p class="question-subtext">Select the one that fits best.</p>
-    <div class="answers" role="radiogroup" aria-labelledby="q3">
       <button type="button" class="answer" data-letter="A" role="radio" aria-checked="false">"My worries are wearing out my inner peace." I feel like I can never fully switch off.</button>
       <button type="button" class="answer" data-letter="B" role="radio" aria-checked="false">I'm running on fumes. I keep pushing through but I can feel myself getting more reactive, more brittle, less like myself.</button>
       <button type="button" class="answer" data-letter="C" role="radio" aria-checked="false">I read this and felt something: "I've not ever experienced that depth of myself before." I want that. I just don't know how to get there.</button>
@@ -600,16 +575,17 @@
   </section>
 
   <!-- ==============================================================
-       SCREEN 4 - QUESTION 4 (auto-submit on tap)
+       SCREEN 3 - QUESTION 3 (auto-submit on tap, final question)
+       (Was QUESTION 4 in the prior structure.)
        ============================================================== -->
-  <section class="screen" id="screen-4" data-question="4" aria-labelledby="q4">
+  <section class="screen" id="screen-3" data-question="3" aria-labelledby="q3">
     <div class="progress">
-      <p class="progress-label">Question 4 of 4</p>
+      <p class="progress-label">Question 3 of 3</p>
       <div class="progress-bar"><div class="progress-fill" style="width: 100%;"></div></div>
     </div>
-    <h2 class="question-headline" id="q4">What would it mean to you if you could finally meditate - actually meditate, not just sit there?</h2>
+    <h2 class="question-headline" id="q3">What would it mean to you if you could finally meditate - actually meditate, not just sit there?</h2>
     <p class="question-subtext">Select the one that fits best.</p>
-    <div class="answers" role="radiogroup" aria-labelledby="q4">
+    <div class="answers" role="radiogroup" aria-labelledby="q3">
       <button type="button" class="answer" data-letter="A" role="radio" aria-checked="false">I could stop fighting my own mind. For the first time in my life, I could clear my head fully.</button>
       <button type="button" class="answer" data-letter="B" role="radio" aria-checked="false">I would feel grounded. Calmer, steadier, more hopeful. Less anxiety. More energy. Actually present in my own life.</button>
       <button type="button" class="answer" data-letter="C" role="radio" aria-checked="false">I would feel genuinely rested. Not just less tired - restored. Like my whole demeanor has shifted to calm.</button>
@@ -884,9 +860,8 @@
 
   var NEXT_SCREEN = {
     1: 'screen-2',
-    2: 'screen-3',
-    3: 'screen-4'
-    /* Q4 routes to a result via pickWinner(scores) */
+    2: 'screen-3'
+    /* Q3 (the final question) routes to a result via pickWinner(scores) */
   };
 
   var RESULT_SCREEN = {
@@ -1021,7 +996,7 @@
                              and immediately advances.
      ================================================================= */
   function advanceFrom(qNum) {
-    if (qNum === 4) {
+    if (qNum === 3) {
       var winner = pickWinner(scores);
       sendTracking(winner);
       showScreen(RESULT_SCREEN[winner]);
