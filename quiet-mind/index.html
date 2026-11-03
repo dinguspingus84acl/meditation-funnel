@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>You're in · Find your Quiet Mind type | The Quiet Mind Method · Art of Living</title>
+<meta name="robots" content="noindex">
+<!--
+  v5 · Quiet Mind Check confirmation page (diagnostic page + text-first opt-in)
+  MERGE FIELDS (replace server-side / via your funnel builder, or pass as URL params of the same name):
+  {{first_name}} {{session_day}} {{session_time}} {{session_date_iso}} {{join_link}} {{phone}} {{rebook_link}} {{contact_id}}
+  {{seats_left}} {{seats_total}}  (v5.1: real live-seat numbers for this session; leave unmerged/empty and the seats bar hides)
+  {{sms_number}}  (v5: the GHL / iMessage-capable number people text their result to, E.164, e.g. +13175550100)
+  See NOTES.md for webhook payload, SMS/email sequence, and setup.
+-->
+<!-- Microsoft Clarity (optional, see NOTES.md "FAQ click tracking"): paste your Clarity project snippet here. -->
+<!-- Meta Pixel: if the pixel is installed on this page, the page fires QuietMindCheckComplete / QuietMindTextOptIn with an event_id for CAPI dedupe. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#211d26;--muted:#5d5a66;--bg:#faf8f5;--card:#fff;--line:#e8e3dc;
+  --brand:#8A43B4;--brand-d:#6d3290;--brand-l:#f3eaf8;--brand-xl:#faf5fc;
+  --green:#2e9d5b;--green-l:#e6f5ec;--yellow:#d99a07;--yellow-l:#fdf3dc;--red:#d0473b;--red-l:#fbe8e6;
+  --amber:#a86d00;--amber-l:#fff3d6;--r:16px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);background:var(--bg);line-height:1.55;font-size:16px}
+h1,h2,h3{font-family:Lora,Georgia,serif;font-weight:600;line-height:1.22;margin:0 0 .5em}
+h1{font-size:1.62rem;letter-spacing:-.01em}h2{font-size:1.35rem}h3{font-size:1.05rem}
+p{margin:0 0 1em}
+a{color:var(--brand-d)}
+.wrap{max-width:720px;margin:0 auto;padding:0 18px}
+header.top{background:#fff;border-bottom:1px solid var(--line);position:relative;z-index:6}
+header.top .wrap{display:flex;align-items:center;justify-content:space-between;height:58px}
+header.top img{height:32px;width:auto}
+.progress{font-size:.8rem;color:var(--muted)}
+.progress b{color:var(--ink)}
+.bar{height:4px;background:var(--line)}
+.bar span{display:block;height:100%;width:50%;background:var(--amber);transition:width .5s,background .5s}
+.bar.done span{width:100%;background:var(--green)}
+section{padding:24px 0}
+#top{padding:18px 0 16px}
+.pill{display:inline-flex;align-items:center;gap:8px;background:var(--amber-l);color:var(--amber);font-weight:600;font-size:.8rem;padding:6px 12px;border-radius:999px;border:1px solid #f1d58f;margin-bottom:14px}
+.pill .ck{color:var(--green);font-weight:700}
+.pill .sep{opacity:.4}
+.pill .dot{width:8px;height:8px;border-radius:50%;background:var(--amber);animation:pulse 1.6s infinite}
+.pill.ok{background:var(--green-l);color:var(--green);border-color:#b9e2c8}.pill.ok .dot{background:var(--green);animation:none}
+@keyframes pulse{50%{opacity:.35}}
+.sub{color:var(--muted);font-size:1.02rem}
+.sub b{color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.session{display:grid;gap:14px;margin-top:6px}
+.session dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:.93rem}
+.session dt{color:var(--muted)}.session dd{margin:0;font-weight:500}
+.merge{background:#fff7cc;border-radius:4px;padding:0 3px;font-family:ui-monospace,Menlo,monospace;font-size:.85em}
+.btn{appearance:none;border:0;cursor:pointer;font:inherit;font-weight:600;border-radius:12px;padding:14px 18px;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;transition:transform .05s,background .2s}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--brand);color:#fff;width:100%;font-size:1.05rem;padding:16px;box-shadow:0 6px 18px rgba(138,67,180,.28)}
+.btn-primary:hover{background:var(--brand-d)}
+.btn-primary[disabled]{opacity:.6;cursor:wait}
+.btn-primary small{display:block;font-weight:400;font-size:.78rem;opacity:.9}
+.btn-ghost{background:#fff;color:var(--brand-d);border:1.5px solid var(--brand);font-size:.9rem;padding:10px 14px}
+.cal{display:flex;gap:10px;flex-wrap:wrap}.cal .btn{flex:1 1 140px}
+.strip{display:flex;gap:10px;align-items:center;justify-content:space-between;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-top:4px}
+.strip .when{font-size:.9rem;line-height:1.35;min-width:0}
+.strip .when .meta{display:block;color:var(--muted);font-size:.76rem;margin-top:2px}
+.cal.mini{flex:0 0 auto;flex-direction:column;gap:6px}.cal.mini .btn{flex:0 0 auto;padding:6px 10px;font-size:.78rem;border-radius:9px}
+.step{font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--brand);font-weight:600;margin-bottom:6px}
+/* video */
+.vwrap{background:var(--bg);padding-bottom:10px}
+.vwrap.pinned{position:sticky;top:0;z-index:5;box-shadow:0 8px 16px -12px rgba(0,0,0,.35)}
+.video{position:relative;aspect-ratio:16/9;border-radius:var(--r);overflow:hidden;background:#1d1424}
+.video video,.video iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;object-fit:cover;background:#000}
+.vcover{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;cursor:pointer;background:linear-gradient(180deg,rgba(20,10,28,.15),rgba(20,10,28,.55));border:0;padding:0;width:100%;color:#fff;font:inherit}
+.vcover .play{width:74px;height:74px;border-radius:50%;background:rgba(255,255,255,.95);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(0,0,0,.3)}
+.vcover .play svg{margin-left:5px}
+.vcover .vt{font-family:Lora,serif;font-size:1rem;margin-bottom:18px;font-weight:600;text-shadow:0 2px 8px rgba(0,0,0,.6);padding:0 16px;text-align:center}
+.vcover .vl{position:absolute;left:12px;bottom:10px;font-size:.78rem;background:rgba(0,0,0,.45);padding:4px 10px;border-radius:999px}
+.vcover.hide{display:none}
+.caption{font-size:.86rem;color:var(--muted);margin:10px 0 0;text-align:center}
+/* grid */
+.qhead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.count{flex:0 0 auto;font-size:.78rem;font-weight:600;color:var(--brand-d);background:var(--brand-l);border-radius:999px;padding:5px 10px;white-space:nowrap}
+.hint{font-size:.85rem;color:var(--muted);margin:0 0 6px}
+.row{border-top:1px solid var(--line);padding:14px 0;transition:background .3s,box-shadow .3s}
+.row:first-child{border-top:0}
+.row.cue{border-radius:12px;background:var(--brand-xl);box-shadow:0 0 0 2px var(--brand);border-top-color:transparent;padding:14px 10px;margin:0 -10px}
+.row .rt{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.row h3{margin:0}
+.row .q{font-size:.86rem;color:var(--muted)}
+.row .now{display:none;font-size:.7rem;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--brand);padding:2px 8px;border-radius:999px;text-transform:uppercase}
+.row.cue .now{display:inline-block}
+.choices{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.choice{appearance:none;font:inherit;font-size:.8rem;line-height:1.25;font-weight:500;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:10px 6px 9px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--ink);min-height:84px;text-align:center;transition:all .15s}
+.choice .e{font-size:1.35rem;line-height:1}
+.choice .lab{font-weight:600;font-size:.82rem}
+.choice .d{color:var(--muted);font-size:.74rem}
+.choice:hover{border-color:#cfc6bb}
+.choice:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+.choice[aria-checked="true"][data-v="green"]{background:var(--green-l);border-color:var(--green);color:#1d6b3d}
+.choice[aria-checked="true"][data-v="yellow"]{background:var(--yellow-l);border-color:var(--yellow);color:#8a6100}
+.choice[aria-checked="true"][data-v="red"]{background:var(--red-l);border-color:var(--red);color:#9b2c22}
+.choice[aria-checked="true"] .d{color:inherit}
+/* result */
+.result{margin-top:14px;border-radius:14px;background:var(--brand-l);padding:18px;border:1px solid #e1cdee}
+.result .locked{color:var(--muted);font-size:.92rem;margin:0}
+.result .tlabel{font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--brand-d);font-weight:600}
+.result .tname{font-family:Lora,serif;font-size:1.7rem;font-weight:600;color:var(--brand-d);line-height:1.15;margin:2px 0 4px}
+.result .tline{font-size:.95rem;margin:0 0 12px}
+.score{display:flex;align-items:baseline;gap:8px}
+.score .n{font-family:Lora,serif;font-size:1.6rem;font-weight:600;line-height:1}
+.score .of{color:var(--muted);font-size:.88rem}
+.meter{height:10px;background:#fff;border-radius:999px;overflow:hidden;margin:8px 0 12px}
+.meter span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--red),var(--yellow),var(--green));background-size:600px 100%;transition:width .5s}
+.read{font-size:.93rem;margin:0 0 10px}
+.watch{list-style:none;padding:0;margin:6px 0 0;display:grid;gap:8px}
+.watch li{background:#fff;border-radius:10px;padding:10px 12px;font-size:.88rem;border-left:4px solid var(--yellow)}
+.watch li.red{border-left-color:var(--red)}
+.prep{margin-top:12px;background:#fff;border-radius:10px;padding:12px;font-size:.9rem;border:1px dashed #cfb3e2}
+.prep b{color:var(--brand-d)}
+.noise{margin-top:14px}
+.noise .lbl2{font-weight:600;font-size:.92rem;margin-bottom:6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{appearance:none;font:inherit;font-size:.85rem;font-weight:600;min-width:38px;height:38px;border-radius:10px;border:1.5px solid var(--line);background:#fff;cursor:pointer;color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:#fff}
+.noise .tiny{font-size:.78rem;color:var(--muted);margin:6px 0 0}
+.voices{margin:0 0 14px;display:grid;gap:10px}
+.voices .vh{font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--brand);font-weight:600;margin:0}
+.quote{position:relative;margin:0;background:#fff;border:1px solid var(--line);border-left:4px solid var(--brand);border-radius:12px;padding:12px 14px}
+.quote p{margin:0 0 6px;font-size:.92rem;font-family:Lora,Georgia,serif;font-style:italic}
+.quote cite{font-style:normal;font-size:.8rem;color:var(--muted)}
+.quote cite b{color:var(--ink);font-weight:600}
+/* Visible flag so placeholders can't ship unnoticed. Disappears when you delete data-placeholder="true". */
+.quote[data-placeholder="true"]{outline:2px dashed #d0473b;outline-offset:2px}
+.quote[data-placeholder="true"]::before{content:"PLACEHOLDER: replace before launch";position:absolute;top:-10px;right:10px;background:#d0473b;color:#fff;font:600 .62rem/1 Poppins,sans-serif;letter-spacing:.04em;padding:4px 6px;border-radius:6px}
+.voices .fine{margin:0}
+/* form */
+.gets{list-style:none;padding:0;margin:0 0 16px;display:grid;gap:6px;font-size:.92rem}
+.gets li::before{content:"✓";color:var(--green);font-weight:700;margin-right:8px}
+label.lbl{display:block;font-weight:600;margin-bottom:6px}
+textarea,input[type=tel]{width:100%;font:inherit;font-size:16px;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;background:#fff;color:var(--ink)}
+textarea{min-height:80px;resize:vertical}
+textarea:focus,input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-l)}
+.small{font-size:.76rem;color:var(--muted);margin-top:10px}
+.err{color:var(--red);font-size:.85rem;margin-top:6px;min-height:1.2em}
+.success{display:none;padding:24px 18px;background:var(--green-l);border:1px solid #b9e2c8;border-radius:var(--r)}
+.success .big{font-size:2.2rem;text-align:center}
+.success h2{color:#1d6b3d;text-align:center}
+.success>p{text-align:center}
+.done .success{display:block}.done #ctaWrap{display:none}
+.why{font-size:.84rem;color:var(--muted);margin:0 0 8px;background:var(--brand-xl);border-radius:10px;padding:8px 10px}
+.why b{color:var(--ink)}
+.selfcheck{font-size:.72rem;color:var(--muted);margin:0 0 6px}
+.btn-text{background:#2e9d5b;box-shadow:0 6px 18px rgba(46,157,91,.3);flex-direction:column;gap:2px;text-align:center}
+.btn-text:hover{background:#25834b}
+.linkish{appearance:none;background:none;border:0;font:inherit;font-size:.86rem;color:var(--brand-d);text-decoration:underline;cursor:pointer;padding:8px 0;margin:0}
+#smsPath{display:none}.textfirst #smsPath{display:block}.textfirst #ctaForm{display:none}.textfirst.formopen #ctaForm{display:block}.textfirst.formopen #smsPath .btn-text{display:none}
+.ps{font-size:.84rem;margin:12px 0 0;padding-top:10px;border-top:1px dashed var(--line)}
+.assess{margin-top:14px}
+.assess .lbl{font-size:.86rem;margin-bottom:4px}
+.assess textarea{min-height:0;height:118px;font-size:.84rem;background:var(--bg);font-family:ui-monospace,Menlo,monospace}
+.assess .row2{display:flex;justify-content:flex-end;margin-top:6px}
+.mech{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:18px 18px 6px;margin-bottom:18px}
+.mech .k{font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--brand);font-weight:600;margin:0 0 6px}
+.mech .big{font-family:Lora,serif;font-size:1.3rem;font-weight:600;line-height:1.3;color:var(--brand-d);margin:6px 0 12px}
+.success .smsnote{display:none}.success.via-sms .smsnote{display:block}.success.via-sms .viaform{display:none}
+.todo{list-style:none;padding:0;margin:14px 0 0;display:grid;gap:10px}
+.todo li{background:#fff;border-radius:12px;padding:12px 14px;border:1px solid #cfe9d7}
+.todo label{display:flex;gap:10px;align-items:flex-start;font-weight:600;cursor:pointer}
+.todo input{width:20px;height:20px;accent-color:var(--green);margin-top:2px;flex:0 0 20px}
+.todo .sub2{display:block;font-weight:400;font-size:.84rem;color:var(--muted)}
+.todo .cal,.todo .chips{margin-top:8px}
+.share{margin-top:14px;text-align:center}
+/* live */
+.live{display:grid;gap:10px;counter-reset:s;padding:0;margin:0}
+.live li{list-style:none;display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px}
+.live li::before{counter-increment:s;content:counter(s);flex:0 0 30px;height:30px;border-radius:50%;background:var(--brand);color:#fff;font-weight:600;display:flex;align-items:center;justify-content:center;font-size:.9rem}
+.live strong{display:block}
+.live span{font-size:.88rem;color:var(--muted)}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 0;padding:0;list-style:none}
+.tags li{font-size:.82rem;background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 12px}
+.tired{margin-top:18px;background:#2b1d36;color:#f4ecf9;border-radius:var(--r);padding:20px}
+.tired h3{color:#fff;font-size:1.2rem}
+.tired p{margin:0;color:#dccbe8;font-size:.95rem}
+/* trust */
+.inst{display:flex;gap:16px;align-items:center}
+.inst img{width:84px;height:84px;border-radius:50%;object-fit:cover;flex:0 0 84px;background:var(--brand-l)}
+.stats{display:flex;gap:18px;margin-top:12px;font-size:.82rem;color:var(--muted);flex-wrap:wrap}
+.stats b{display:block;font-size:1.1rem;color:var(--ink);font-family:Lora,serif}
+.honest{margin-top:14px;background:var(--brand-xl);border-radius:12px;padding:14px;font-size:.9rem;border:1px solid #eadcf3}
+.honest b{color:var(--brand-d)}
+.fine{font-size:.76rem;color:var(--muted);margin:10px 0 0}
+details{border-top:1px solid var(--line);padding:14px 0}
+details:last-child{border-bottom:1px solid var(--line)}
+summary{cursor:pointer;font-weight:600;list-style:none;display:flex;justify-content:space-between;gap:10px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";color:var(--brand);font-size:1.3rem;line-height:1}
+details[open] summary::after{content:"–"}
+details p{margin:8px 0 0;color:var(--muted);font-size:.93rem}
+footer{padding:28px 0 96px;text-align:center;font-size:.78rem;color:var(--muted)}
+.sticky{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.96);border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom));display:none;z-index:10;backdrop-filter:blur(6px)}
+.sticky .btn{width:100%;max-width:520px;margin:0 auto;display:flex;padding:14px}
+.sticky .scd{max-width:520px;margin:0 auto 6px;font-size:.78rem;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.sticky .scd b{color:var(--ink);font-variant-numeric:tabular-nums}
+.sticky .scd .low{color:var(--red);font-weight:600}
+/* v5.1 urgency: countdown + seats (real data only) */
+.urg{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px;margin:0 0 12px}
+.cd-label{font-size:.78rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--brand-d);margin:0 0 8px}
+.cd-boxes{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.cd-boxes span{background:var(--brand-xl);border:1px solid #e6d5f0;border-radius:12px;text-align:center;padding:8px 4px}
+.cd-boxes b{display:block;font-size:1.5rem;line-height:1.1;font-variant-numeric:tabular-nums;color:var(--ink)}
+.cd-boxes i{font-style:normal;font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.cd-live{display:none}
+.urg.is-live .cd-label,.urg.is-live .cd-boxes{display:none}
+.urg.is-live .cd-live{display:block}
+.urg.is-live{border-color:#f0b9b3;background:var(--red-l)}
+.cd-live .btn{width:100%;display:flex;margin-top:8px}
+.livedot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--red);margin-right:6px;animation:pulse 1.2s infinite;vertical-align:middle}
+.seats{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
+.urg.no-cd .seats{margin-top:0;padding-top:0;border-top:0}
+.seats-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:.92rem;margin-bottom:6px}
+.seats-top b{color:var(--ink)}
+.seats-pct{font-size:.75rem;color:var(--muted);white-space:nowrap}
+.seats-bar{height:10px;border-radius:999px;background:var(--line);overflow:hidden}
+.seats-bar span{display:block;height:100%;width:0;background:var(--amber);border-radius:999px;transition:width .8s}
+.seats.low .seats-top b{color:var(--red)}
+.seats.low .seats-bar span{background:linear-gradient(90deg,#e0675c,var(--red))}
+.seats-note{font-size:.8rem;color:var(--muted);margin:8px 0 0}
+.holdnote{background:var(--amber-l);border:1px solid #f1d58f;border-radius:12px;padding:10px 12px;font-size:.88rem;margin:0 0 14px}
+.holdnote b{color:var(--amber)}
+.done .holdnote{display:none}
+.sticky.show{display:block}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#211d26;color:#fff;padding:10px 16px;border-radius:999px;font-size:.88rem;opacity:0;pointer-events:none;transition:opacity .3s;z-index:20}
+.toast.show{opacity:1}
+@media(min-width:760px){
+  h1{font-size:2.25rem}
+  .vcover .vt{font-size:1.25rem}
+  section{padding:32px 0}
+  .session{grid-template-columns:1fr auto;align-items:center}
+  .cal.top{flex-direction:column;min-width:210px}.cal.top .btn{flex:0 0 auto}
+  .card{padding:26px}
+  .live{grid-template-columns:repeat(2,1fr)}
+  .choice{font-size:.86rem}
+  .choice .d{font-size:.8rem}
+  .sticky{display:none!important}
+  .vwrap.pinned{position:static;box-shadow:none}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <img src="https://cdn.prod.website-files.com/6a5fae7925920274d51d0c91/6a6072a663d78d2656b6de90_site-logo.png" alt="Art of Living">
+    <div class="progress" id="progressText"><b>Step 2 of 2</b> · Personalize</div>
+  </div>
+  <div class="bar" id="bar"><span></span></div>
+</header>
+
+<main>
+<!-- 1. STATUS + HEADLINE + SESSION -->
+<section id="top">
+  <div class="wrap">
+    <div class="pill" id="statusPill"><span class="ck">✓</span><span>Seat saved</span><span class="sep">·</span><span class="dot"></span><span id="statusText">Action needed: 1 step left</span></div>
+    <h1>Wait<span id="nameWrap">, <span class="merge" data-field="first_name">{{first_name}}</span></span>. Before you close this tab, find out what's actually keeping your mind on at night.</h1>
+    <p class="sub">Your seat is saved. This 60-second check gives you your <b>Quiet Mind type</b>, and Shalin's team sees the room's answers before class.</p>
+
+    <!-- v5.1 URGENCY (real data only): countdown to {{session_date_iso}} and seats from {{seats_left}} / {{seats_total}}.
+         Each part hides itself if its merge fields are empty or unmerged. No hardcoded fallbacks, no fake ticking-down. -->
+    <div class="urg" id="urg" hidden>
+      <div id="cdWrap" hidden>
+        <p class="cd-label" id="cdLabel">Your live class starts in</p>
+        <div class="cd-boxes" role="timer" aria-live="off">
+          <span><b id="cdD">0</b><i>days</i></span><span><b id="cdH">00</b><i>hrs</i></span><span><b id="cdM">00</b><i>min</i></span><span><b id="cdS">00</b><i>sec</i></span>
+        </div>
+        <div class="cd-live" id="cdLive">
+          <p style="margin:0;font-weight:600"><span class="livedot"></span><span id="cdLiveText">We're live, join now</span></p>
+          <a class="btn btn-primary" id="cdJoin" href="#" target="_blank" rel="noopener">Join the live class →</a>
+          <p class="small" id="cdNoLink" style="margin:8px 0 0" hidden>Your join link is in your texts and email from Art of Living.</p>
+        </div>
+      </div>
+      <div class="seats" id="seats" hidden>
+        <div class="seats-top"><b id="seatsText"></b><span class="seats-pct" id="seatsPct"></span></div>
+        <div class="seats-bar" aria-hidden="true"><span id="seatsFill"></span></div>
+        <p class="seats-note">Live seats are capped so Shalin can guide the practice and take questions. The guided practice and live Q&amp;A only happen in the room, for the people who show up.</p>
+      </div>
+    </div>
+
+    <div class="strip">
+      <div class="when"><b>📅 <span class="merge" data-field="session_day">{{session_day}}</span> · <span class="merge" data-field="session_time">{{session_time}}</span> ET</b><span class="meta">The Quiet Mind Method · free · live online with Shalin Desai · ~75 min</span></div>
+      <div class="cal mini">
+        <button class="btn btn-ghost icsBtn" type="button">+ Calendar</button>
+        <a class="btn btn-ghost gcalBtn" href="#" target="_blank" rel="noopener">Google</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 2. VIDEO + QUIZ (same container so the video can pin on mobile while grading) -->
+<section id="check" style="padding-top:0">
+  <div class="wrap">
+    <div class="vwrap" id="vwrap">
+      <div class="step">Step 1 · Press play <span id="vdur">(1:20, sound on)</span></div>
+      <!--
+        ===== VIDEO =====
+        Ships with a self-hosted MP4 (quiet-mind-vsl.mp4 + vsl-poster.jpg, upload them next to this file).
+        Row-by-row highlighting syncs to the native <video>. To use Vimeo/YouTube instead, replace the <video> tag with:
+        <iframe src="https://player.vimeo.com/video/XXXXXXX?playsinline=1" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen title="Find your Quiet Mind type"></iframe>
+        (sync highlighting then stays off; everything else works). Keep the .video 16:9 wrapper.
+        =================
+      -->
+      <div class="video" id="videoBox">
+        <video id="vsl" src="quiet-mind-vsl.mp4" poster="vsl-poster.jpg" preload="metadata" playsinline></video>
+        <button class="vcover" id="vcover" type="button" aria-label="Play the video: find your Quiet Mind type">
+          <span class="play" aria-hidden="true"><svg width="26" height="30" viewBox="0 0 26 30"><path d="M0 0l26 15L0 30z" fill="#8A43B4"/></svg></span>
+          <span class="vt">Unclench your jaw. Now press play.</span>
+          <span class="vl">▶ 1:20 · sound on</span>
+        </button>
+      </div>
+    </div>
+    <p class="caption">Grade each row as you hear it. The row you're on lights up.</p>
+
+    <div class="card" style="margin-top:14px">
+      <div class="qhead">
+        <div>
+          <div class="step">Step 2 · Grade yourself as you watch</div>
+          <h2 style="margin-bottom:4px">Your Quiet Mind Check</h2>
+        </div>
+        <span class="count" id="count">0 / 4</span>
+      </div>
+      <p class="hint">Tap one per row. Think about a typical week. Only you and Shalin's team see this.</p>
+      <p class="why"><b>Why these 4?</b> They're the four places a mind that won't switch off shows up at night. Your reddest row tells Shalin's team which part of the class matters most to you, and tells you what to watch for.</p>
+
+      <div id="grid"></div>
+
+      <div class="result" id="result" aria-live="polite">
+        <div id="resultBody"><p class="locked">🔒 <b>4 taps to unlock your Quiet Mind type</b> and what to watch for live.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. SMS OPT-IN -->
+<section id="send" style="padding-top:0">
+  <div class="wrap">
+    <div class="card" id="ctaCard">
+      <div id="ctaWrap">
+        <div class="step">Step 3 · Lock it in</div>
+        <h2 style="margin-bottom:10px">Get your score by text, plus the 2-minute prep</h2>
+        <p class="holdnote" id="holdNote"><b>Wait, live seats fill.</b> Your seat is saved. Finish this step to confirm you're coming, and your join link lands on your phone so you don't miss the start.</p>
+        <ul class="gets">
+          <li>Your type and score, saved where you'll see it</li>
+          <li>A 2-minute prep for your loudest signal</li>
+          <li>Your join link, so you're not digging through email at <span class="merge" data-field="session_time">{{session_time}}</span></li>
+        </ul>
+
+        <!-- TEXT-FIRST PATH (v5, phones only, needs {{sms_number}}): opens the texting app with the result pre-filled.
+             The person texts first: a two-way thread, so your join link arrives in a conversation they started. -->
+        <div id="smsPath">
+          <a class="btn btn-primary btn-text" id="smsBtn" href="#" role="button"><span>💬 Text me my Quiet Mind score</span><small>Opens your texting app with your answers filled in. Just hit send.</small></a>
+          <div class="err" id="smsErr" role="alert"></div>
+          <p class="why" style="margin-top:2px"><b>Why text?</b> Your prep and join link land in a thread you started, so they're one tap away at <span class="merge" data-field="session_time">{{session_time}}</span> instead of buried in email.</p>
+          <p class="small" style="margin-top:4px">When you send that text, you agree to receive text messages from Art of Living about this class, including your score and session reminders. Msg &amp; data rates may apply. Msg frequency varies. Reply STOP to opt out, HELP for help. Consent is not a condition of registration.</p>
+          <button type="button" class="linkish" id="useForm">Rather type your number? Do it here</button>
+        </div>
+
+      <form id="ctaForm" novalidate>
+
+        <label class="lbl" for="phone">Mobile number</label>
+        <input type="tel" id="phone" name="phone" autocomplete="tel" inputmode="tel" placeholder="(555) 123-4567" value="{{phone}}">
+        <div class="err" id="err" role="alert"></div>
+
+        <label class="lbl" for="question" style="margin-top:4px">What should Shalin address? <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+        <textarea id="question" name="question" maxlength="500" placeholder="e.g. Around 2 a.m. I start replaying work conversations…"></textarea>
+        <p class="small" style="margin:6px 0 14px">Shalin's team reviews questions before class and brings the common ones into the live Q&amp;A.</p>
+
+        <button class="btn btn-primary" type="submit" id="submitBtn"><span>💬 Text me my Quiet Mind score<small>+ your 2-min prep and join link</small></span></button>
+        <p class="small">By tapping the button, you agree to receive text messages from Art of Living about this class, including your score and session reminders. Msg &amp; data rates may apply. Msg frequency varies. Reply STOP to opt out, HELP for help. Consent is not a condition of registration.</p>
+      </form>
+        <p class="ps"><b>P.S.</b> We hate spam as much as you do. We only text about this class: your score, your prep, and your join link.</p>
+
+        <div class="assess" id="assess" hidden>
+          <label class="lbl" for="assessText">Your Quiet Mind Check (copy &amp; paste)</label>
+          <textarea id="assessText" readonly rows="5"></textarea>
+          <div class="row2"><button type="button" class="btn btn-ghost" id="copyBtn" style="padding:8px 14px">Copy</button></div>
+        </div>
+      </div>
+
+      <div class="success" id="success" tabindex="-1">
+        <div class="big">✅</div>
+        <h2>Done. Your session is personalized.</h2>
+        <p class="smsnote">Once your text goes through, we'll reply in that thread with your prep and your join link. <button type="button" class="linkish" id="smsRetry">Didn't send? Enter your number instead</button></p>
+        <p class="viaform">Your score is on its way by text. See you <span class="merge" data-field="session_day">{{session_day}}</span> at <span class="merge" data-field="session_time">{{session_time}}</span> ET.</p>
+        <p class="small" id="successScore" style="margin-top:0"></p>
+        <h3 style="margin-top:18px">Make it real (30 seconds)</h3>
+        <ul class="todo" id="todo">
+          <li><label><input type="checkbox" data-k="cal"><span>Put it on my calendar<span class="sub2">So it's already there when the evening gets busy.</span></span></label>
+            <div class="cal"><button class="btn btn-ghost icsBtn" type="button">📅 Apple / Outlook</button><a class="btn btn-ghost gcalBtn" href="#" target="_blank" rel="noopener">Google Calendar</a></div></li>
+          <li><label><input type="checkbox" data-k="spot"><span>Pick my spot<span class="sub2">Somewhere you can sit comfortably for 10 minutes with your eyes closed.</span></span></label>
+            <div class="chips" id="spotChips" role="group" aria-label="Where you'll join from"><button type="button" class="chip" data-spot="couch" aria-pressed="false" style="padding:0 12px">Couch</button><button type="button" class="chip" data-spot="bedroom" aria-pressed="false" style="padding:0 12px">Bedroom</button><button type="button" class="chip" data-spot="desk" aria-pressed="false" style="padding:0 12px">Desk chair</button><button type="button" class="chip" data-spot="other" aria-pressed="false" style="padding:0 12px">Somewhere else</button></div></li>
+          <li><label><input type="checkbox" data-k="tell"><span>Tell someone at home<span class="sub2">"I'm offline for 75 minutes at <span class="merge" data-field="session_time">{{session_time}}</span>." It protects the time.</span></span></label></li>
+        </ul>
+        <div class="share">
+          <p class="small" style="margin:0 0 8px">Know someone who lies awake too?</p>
+          <button class="btn btn-ghost" type="button" id="shareBtn">🎁 Send them a free seat</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ATTENDEE VOICES: v5 moved these directly under the opt-in card, so the ask sits right under the result (diagnostic-page pattern).
+         All three quotes below are PLACEHOLDERS. Replace with real attendee quotes (with permission), then remove data-placeholder="true". -->
+    <div class="voices" id="voices" style="margin-top:16px">
+      <p class="vh">From people who've taken the live class</p>
+      <!-- PLACEHOLDER TESTIMONIAL: replace before launch -->
+      <figure class="quote" data-placeholder="true">
+        <p>"I came in expecting another 'just relax' talk. Partway through the breathing I realized my shoulders had come down from my ears, and I hadn't noticed them drop."</p>
+        <cite><b>Dana R.</b> · project manager, Columbus, OH</cite>
+      </figure>
+      <!-- PLACEHOLDER TESTIMONIAL: replace before launch -->
+      <figure class="quote" data-placeholder="true">
+        <p>"Camera off, on my couch in sweats. Nobody put me on the spot. I just followed along, and for the first time all week my head wasn't running the day back."</p>
+        <cite><b>Mike T.</b> · Indianapolis, IN</cite>
+      </figure>
+      <!-- PLACEHOLDER TESTIMONIAL: replace before launch -->
+      <figure class="quote" data-placeholder="true">
+        <p>"I'd quit two meditation apps. Starting with the body instead of trying to clear my head was the first time it didn't feel like I was failing at it."</p>
+        <cite><b>Priya S.</b> · nurse, Edison, NJ</cite>
+      </figure>
+      <p class="fine">Individual experiences vary.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- 4. WHAT HAPPENS LIVE -->
+<section id="next" style="padding-top:0">
+  <div class="wrap">
+    <div class="mech">
+      <p class="k">Why this works</p>
+      <p>You already know "just relax" doesn't work at 11 p.m. Nobody failed at relaxing. The advice was backwards: "clear your mind" asks your mind to do the one thing it can't do on command.</p>
+      <p class="big">Your mind doesn't have an off switch. Your body does.</p>
+      <p>So the live practice starts with your breath and your body, and then you notice what your mind does. Ten minutes, guided by Shalin, and you judge the result yourself.</p>
+    </div>
+    <h2>What happens live</h2>
+    <ol class="live">
+      <li><div><strong>Recognize</strong><span>Why the replay gets louder the harder you fight it, and why trying harder backfires.</span></div></li>
+      <li><div><strong>Understand</strong><span>The Body-to-Mind Shift, and why sequence beats effort.</span></div></li>
+      <li><div><strong>Experience</strong><span>A 10-minute guided breathing and awareness practice, live with Shalin. This is the part a recording can't give you.</span></div></li>
+      <li><div><strong>Reflect &amp; continue</strong><span>Notice what changed (check your before-number), ask your question, and see the full learning path.</span></div></li>
+    </ol>
+    <ul class="tags"><li>Zero experience needed</li><li>Camera optional</li><li>Sweatpants welcome</li><li>Couch or chair is fine</li><li>Nobody calls on you</li><li>Leave whenever you want</li></ul>
+    <div class="tired">
+      <h3>Exhausted that night? Good. Come anyway.</h3>
+      <p>You're the one who holds everything together all day. For 75 minutes, nobody needs anything from you. You don't need energy for this, just a couch: keep your camera off and let Shalin guide you. Skip it, and tonight runs like last night.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 5. TRUST + FAQ -->
+<section id="trust" style="padding-top:0">
+  <div class="wrap">
+    <div class="card">
+      <div class="inst">
+        <img src="https://cdn.prod.website-files.com/6a5fae7925920274d51d0c91/6ab59dbf5e8a605dfbb5cc67_Shalin_2026.jpg" alt="Shalin Desai">
+        <div>
+          <div class="step" style="margin:0">Your guide</div>
+          <h3 style="margin:2px 0">Shalin Desai</h3>
+          <div style="font-size:.86rem;color:var(--muted)">International Instructor · Director of Programs, Art of Living Foundation</div>
+        </div>
+      </div>
+      <div class="stats"><div><b>25+ yrs</b>breathwork &amp; meditation</div><div><b>5,000+</b>workshops led</div><div><b>20</b>countries</div></div>
+      <p style="margin:14px 0 0;font-size:.92rem;color:var(--muted)">Shalin has taught corporate masterclasses at Microsoft, Salesforce, Dell, and Merck. He's an industrial engineer who works full-time in supply chain and is a dad of two in Indianapolis, so he teaches in plain language for people with full lives.</p>
+      <div class="honest"><b>Full transparency:</b> at the end, Shalin shares the optional paid course, SKY Breath Meditation Part 1, including what it covers and what it costs. Nothing to buy, no pressure, and the free session stands on its own.</div>
+      <p class="fine">SKY Breath Meditation (taught in the paid Part 1 course) is the subject of 200+ peer-reviewed studies. Those findings refer to the full Part 1 course, not this free session. Individual experiences vary.</p>
+    </div>
+
+    <h2 style="margin-top:28px">Questions</h2>
+    <details data-faq="apps"><summary>I've tried meditation apps. They never work for me.</summary><p>You're right to be skeptical. Those apps asked your mind to go quiet first, which is the one thing a busy mind can't do on command. This starts with the body instead. You'll try it for 10 minutes, live, and judge for yourself.</p></details>
+    <details data-faq="camera"><summary>Do I have to be on camera or talk?</summary><p>No. Camera is optional and you never have to speak. You can ask a question in the chat if you want to.</p></details>
+    <details data-faq="catch"><summary>Is it really free? What's the catch?</summary><p>It's free, with no card required. Why free? Feeling the practice live is the fairest way to decide whether you want to learn the full version. At the end Shalin explains the optional paid SKY Breath Meditation Part 1 course, what it includes and what it costs. If it's not for you, skip it: the free session stands on its own.</p></details>
+    <details data-faq="religion"><summary>Is this religious?</summary><p>No beliefs required. It's a guided breathing and awareness practice you do sitting comfortably, and you don't need any particular faith or background to take part.</p></details>
+    <details data-faq="replay"><summary>Can I just watch a replay?</summary><p>The 10-minute practice is guided live and responds to the room. That's the part a recording can't give you, so plan to be there live. If your time stops working, switch to another live session: <a href="{{rebook_link}}" id="rebook"><span class="merge" data-field="rebook_link">{{rebook_link}}</span></a>. Your answers stay saved on this device.</p></details>
+    <details data-faq="situation"><summary>Will this work for my situation? (shift work, pain, can't sit on the floor)</summary><p>You do the practice sitting in any chair or on a couch, and nothing involves the floor. It isn't a treatment and doesn't replace medical care, so if you have a health condition, check with your doctor about breathing exercises. The fairest test is the one you run yourself: rate your mind 1–10 before class and again right after the practice.</p></details>
+    <details data-faq="asleep"><summary>What if I nod off during the practice?</summary><p>Sit up on a couch or chair rather than lying in bed, and you'll be able to follow along. If you drift for a moment, Shalin's voice brings you back. With your camera off, nobody sees either way.</p></details>
+    <details data-faq="interrupt"><summary>What if my kids or partner interrupt?</summary><p>Tell them ahead of time: "I'm offline for 75 minutes" (it's on the checklist above). If you get pulled away, tap your join link again to rejoin.</p></details>
+  </div>
+</section>
+</main>
+
+<footer>© Art of Living Foundation · <a href="#">Privacy</a> · <a href="#">Terms</a></footer>
+
+<div class="sticky" id="sticky"><div class="scd" id="stickyCd" hidden><span id="stickyCdText"></span><span id="stickySeats"></span></div><a href="#check" class="btn btn-primary" id="stickyBtn">Find my Quiet Mind type →</a></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+  "use strict";
+  // ===== CONFIG =====
+  const WEBHOOK_URL = "https://example.com/webhook";   // GoHighLevel inbound webhook / Zapier catch hook / Make URL
+  const SESSION_ISO = "{{session_date_iso}}";            // e.g. "2026-11-04T20:30:00-05:00"
+  const FALLBACK_ISO = "2026-11-04T20:30:00-05:00";
+  const DURATION_MIN = 75;
+  const JOIN_LINK = "{{join_link}}";
+  const REBOOK_LINK = "{{rebook_link}}";
+  const SHARE_URL = "https://go.us.artofliving.org/quiet-mind-method";
+  const CONTACT_ID = "{{contact_id}}";
+  const STORE_KEY = "qmc_answers_v5";
+  const SEATS_LEFT = "{{seats_left}}";                  // v5.1: real remaining live seats for this session (GHL custom value / calendar capacity minus bookings)
+  const SEATS_TOTAL = "{{seats_total}}";                // v5.1: real live-seat cap for this session. If either is empty/unmerged the seats bar hides.
+  const SEATS_LOW_PCT = 0.25, SEATS_LOW_ABS = 20;       // "low" styling when <=25% left or <=20 seats left
+  const SMS_NUMBER = "{{sms_number}}";                  // v5: GHL / iMessage-capable number people text their result to (E.164). Leave unmerged to hide the text-first button.
+  // Video timestamps (seconds) where each row is read in the VSL. Rebuild these if you re-edit the video.
+  const ROW_CUES = [29.4, 35.2, 40.2, 45.4, 50.6];
+
+  const ROWS = [
+    {id:"sleep", title:"Falling asleep", q:"Once the lights go off…",
+     c:{green:"Out in ~20 min", yellow:"Some nights it drags", red:"Still awake at midnight"},
+     type:"The Wide-Awake", tline:"Your body is still \"on\" when the lights go off, and sleep waits for it.",
+     watch:{seg:"Recognize", text:"why trying harder to fall asleep backfires, and where to start instead."},
+     prep:"Join from wherever you can get most comfortable. Comfort is the point, not a reward."},
+    {id:"replay", title:"The replay", q:"When the house goes quiet…",
+     c:{green:"Day stays in the day", yellow:"Some nights it loops", red:"Loops all night"},
+     type:"The Replayer", tline:"Your mind reopens the day the moment the house goes quiet, and arguing with it makes it louder.",
+     watch:{seg:"Understand", text:"the Body-to-Mind Shift: why the replay quiets when you start with the body, not the thoughts."},
+     prep:"5 minutes before class, write tomorrow's list on paper, so it's out of your head for 75 minutes."},
+    {id:"tension", title:"Your body at night", q:"Jaw, shoulders, chest…",
+     c:{green:"Loose", yellow:"Tight some nights", red:"Braced, even in bed"},
+     type:"The Braced", tline:"Your body stays braced after the day is done, and your mind takes its cue from it.",
+     watch:{seg:"Experience", text:"the 10-minute guided practice. Notice your jaw and shoulders before and after."},
+     prep:"Right before class, rate your jaw and shoulder tension 1–10. Check again after the practice."},
+    {id:"energy", title:"Mornings", q:"When the alarm goes off…",
+     c:{green:"Rested", yellow:"It depends", red:"Tired before my feet hit the floor"},
+     type:"The Running-on-Empty", tline:"Your nights aren't refilling the tank, so you start every day already behind.",
+     watch:{seg:"Reflect", text:"how to carry the practice into your evenings so mornings can start to feel different."},
+     prep:"Eat beforehand and keep water nearby, so you can simply settle in."}
+  ];
+  const STEADY = {type:"The Steady", tline:"Your nights are mostly calm. You'll leave with a tool for the nights stress spikes."};
+  const VALS = {green:{e:"🟢",l:"Green",pts:2},yellow:{e:"🟡",l:"Yellow",pts:1},red:{e:"🔴",l:"Red",pts:0}};
+
+  const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+  const isMerge = v => !v || /^\{\{.*\}\}$/.test(String(v).trim());
+  const params = new URLSearchParams(location.search);
+  let state = {scores:{}, question:"", noise:null, spot:null, todo:{}, faq:[], ref:null, channel:null, tracked:{}};
+
+  // ---- merge fields: allow URL params as fallback, hide highlight once replaced ----
+  $$(".merge[data-field]").forEach(el=>{
+    const f = el.dataset.field, p = params.get(f);
+    if(isMerge(el.textContent) && p) el.textContent = p;
+    if(!isMerge(el.textContent)) el.classList.remove("merge");
+  });
+  const rebookHref = isMerge(REBOOK_LINK) ? (params.get("rebook_link") || SHARE_URL) : REBOOK_LINK;
+  $("#rebook").href = rebookHref;
+  if(isMerge($("#rebook").textContent)) $("#rebook").textContent = "pick another time";
+
+  // ---- restore ----
+  try{ const saved = JSON.parse(localStorage.getItem(STORE_KEY)||"null"); if(saved) state = Object.assign(state, saved); }catch(e){}
+  if(!state.ref){ state.ref = (params.get("contact_id") || (isMerge(CONTACT_ID) ? "" : CONTACT_ID) || Math.random().toString(36).slice(2,8)).toString().slice(0,24); }
+  ROWS.forEach(r=>{ const v = params.get(r.id); if(v && VALS[v]) state.scores[r.id]=v; });
+  if(params.get("q")) state.question = params.get("q");
+
+  // ---- build grid ----
+  const grid = $("#grid");
+  ROWS.forEach((r,i)=>{
+    const row = document.createElement("div");
+    row.className="row"; row.id="row-"+r.id;
+    row.innerHTML = `<div class="rt"><h3 id="h-${r.id}">${i+1}. ${r.title}</h3><span class="q">${r.q}</span><span class="now">Grade now</span></div>
+      <div class="choices" role="radiogroup" aria-labelledby="h-${r.id}"></div>`;
+    const box = row.querySelector(".choices");
+    Object.keys(VALS).forEach(k=>{
+      const b = document.createElement("button");
+      b.type="button"; b.className="choice"; b.dataset.row=r.id; b.dataset.v=k;
+      b.setAttribute("role","radio"); b.setAttribute("aria-checked","false");
+      b.setAttribute("aria-label", `${r.title}: ${VALS[k].l}, ${r.c[k]}`);
+      b.innerHTML = `<span class="e" aria-hidden="true">${VALS[k].e}</span><span class="lab">${VALS[k].l}</span><span class="d">${r.c[k]}</span>`;
+      box.appendChild(b);
+    });
+    grid.appendChild(row);
+  });
+  grid.addEventListener("click", e=>{
+    const b = e.target.closest(".choice"); if(!b) return;
+    const first = answered()<4;
+    state.scores[b.dataset.row] = b.dataset.v; persist(); render();
+    if(first && answered()===4 && !videoPlaying()){ setTimeout(()=>$("#result").scrollIntoView({behavior:"smooth",block:"center"}),250); }
+  });
+  grid.addEventListener("keydown", e=>{
+    const b = e.target.closest(".choice"); if(!b) return;
+    if(!["ArrowRight","ArrowLeft","ArrowDown","ArrowUp"].includes(e.key)) return;
+    e.preventDefault();
+    const sib = [...b.parentNode.children], i = sib.indexOf(b);
+    const n = sib[(i + (e.key==="ArrowRight"||e.key==="ArrowDown"?1:-1) + 3) % 3];
+    n.focus(); n.click();
+  });
+
+  $("#question").value = state.question || "";
+  $("#question").addEventListener("input", e=>{ state.question = e.target.value; persist(); updateAssess(); });
+
+  const total = ()=> ROWS.reduce((s,r)=> s + (state.scores[r.id]?VALS[state.scores[r.id]].pts:0), 0);
+  const answered = ()=> ROWS.filter(r=>state.scores[r.id]).length;
+  function topRow(){
+    return ROWS.find(r=>state.scores[r.id]==="red") || ROWS.find(r=>state.scores[r.id]==="yellow") || null;
+  }
+  function band(t){
+    if(t>=7) return "Mostly quiet nights. Come for a tool you can use when stress spikes.";
+    if(t>=5) return "Some nights your mind wins. That's a very workable place to start.";
+    if(t>=3) return "Your mind runs the show most nights. This session was built for exactly this.";
+    return "Nights are hard right now. Come as you are, even tired. Especially tired.";
+  }
+
+  function render(){
+    $$(".choice").forEach(b=>{
+      const on = state.scores[b.dataset.row]===b.dataset.v;
+      b.setAttribute("aria-checked", on?"true":"false");
+      b.tabIndex = on || (!state.scores[b.dataset.row] && b.dataset.v==="green") ? 0 : -1;
+    });
+    const n = answered(), t = total();
+    $("#count").textContent = `${n} / 4`;
+    if(n===4){ ["#smsErr","#err"].forEach(id=>{ const el=$(id); if(el && /Grade all 4/.test(el.textContent)) el.textContent=""; }); }
+    if(!$("#stickyBtn").dataset.live){
+      $("#stickyBtn").textContent = n===4 ? "💬 Text me my Quiet Mind score →" : "Find my Quiet Mind type →";
+      $("#stickyBtn").setAttribute("href", n===4 ? "#send" : "#check");
+    }
+    const body = $("#resultBody");
+    if(n<4){
+      body.innerHTML = `<p class="locked">🔒 ${n? `${n} of 4 tapped. ${4-n} to go to unlock` : "<b>4 taps to unlock"} your Quiet Mind type${n?"":"</b>"} and what to watch for live.</p>`;
+      return;
+    }
+    const top = topRow(), T = top || STEADY;
+    const items = ROWS.filter(r=>["red","yellow"].includes(state.scores[r.id]))
+      .sort((a,b)=> (state.scores[a.id]==="red"?0:1)-(state.scores[b.id]==="red"?0:1))
+      .map(r=>`<li class="${state.scores[r.id]}">${VALS[state.scores[r.id]].e} <b>${r.title}</b>: in <b>${r.watch.seg}</b>, watch for ${r.watch.text}</li>`).join("");
+    const chips = Array.from({length:10},(_,i)=>`<button type="button" class="chip" data-n="${i+1}" aria-pressed="${state.noise===i+1}">${i+1}</button>`).join("");
+    body.innerHTML = `
+      <p class="selfcheck">Your Quiet Mind Check result · a self-check, not a medical assessment</p>
+      <div class="tlabel">Your Quiet Mind type</div>
+      <div class="tname" id="typeName">${T.type}</div>
+      <p class="tline">${T.tline}</p>
+      <div class="score"><span class="n" id="scoreN">${t}</span><span class="of">/ 8 Quiet Mind score</span></div>
+      <div class="meter"><span id="meter" style="width:${(t/8)*100}%"></span></div>
+      <p class="read" id="readText">${band(t)}</p>
+      ${items ? `<div class="step" style="margin-top:6px">Where your nights leak rest, and where the class covers it</div><ul class="watch" id="watchList">${items}</ul>` : ""}
+      ${top ? `<div class="prep"><b>Your 2-minute prep:</b> ${top.prep}</div>` : `<div class="prep"><b>Your 2-minute prep:</b> Notice what your body does on your next stressful evening. Bring that moment to class.</div>`}
+      <div class="noise">
+        <div class="lbl2">How loud is your mind right now? <span style="font-weight:400;color:var(--muted)">(optional)</span></div>
+        <div class="chips" id="noiseChips" role="group" aria-label="Mind noise from 1 (quiet) to 10 (very loud)">${chips}</div>
+        <p class="tiny">1 = quiet, 10 = very loud. This is your before-number. Right after the live practice, check it again and see if it moves.</p>
+      </div>`;
+    updateAssess();
+  }
+  function assessmentText(){
+    const top = topRow(), T = top || STEADY, first = txt("first_name");
+    const lines = ROWS.map(r=> `${VALS[state.scores[r.id]].e} ${r.title}: ${r.c[state.scores[r.id]]}`);
+    const day = txt("session_day"), time = txt("session_time");
+    return [first ? `Hi, it's ${first}. My Quiet Mind Check:` : `Hi! My Quiet Mind Check:`,
+      `${T.type}, ${total()}/8`, ...lines,
+      state.noise ? `Before-number: ${state.noise}/10` : null,
+      (day||time) ? `Class: ${[day,time].filter(Boolean).join(" ")}${time?" ET":""}` : null,
+      (state.question||"").trim() ? `Question for Shalin: ${(state.question||"").trim().slice(0,200)}` : null,
+      `Please text me my 2-minute prep and join link.`, `(ref QMC-${state.ref})`].filter(Boolean).join("\n");
+  }
+  function txt(f){ const el=document.querySelector(`[data-field="${f}"]`); return el && !isMerge(el.textContent) ? el.textContent.trim() : ""; }
+  function updateAssess(){
+    const a = $("#assess"); if(!a) return;
+    if(answered()<4){ a.hidden = true; return; }
+    a.hidden = false; $("#assessText").value = assessmentText();
+    if(!state.tracked.complete){ state.tracked.complete = true; persist(); track("QuietMindCheckComplete", {quiet_mind_type:(topRow()||STEADY).type, score_total:total()}); }
+  }
+  $("#result").addEventListener("click", e=>{
+    const c = e.target.closest("#noiseChips .chip"); if(!c) return;
+    state.noise = Number(c.dataset.n); persist();
+    $$("#noiseChips .chip").forEach(x=>x.setAttribute("aria-pressed", String(Number(x.dataset.n)===state.noise)));
+    updateAssess();
+  });
+
+  function persist(){
+    try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){}
+    const p = new URLSearchParams(location.search);
+    ROWS.forEach(r=> state.scores[r.id] ? p.set(r.id, state.scores[r.id]) : p.delete(r.id));
+    const qs = p.toString();
+    history.replaceState(null, "", location.pathname + (qs?"?"+qs:"") + location.hash);
+  }
+
+  // ---- calendar ----
+  const startISO = isMerge(SESSION_ISO) ? (params.get("session_date_iso") || FALLBACK_ISO) : SESSION_ISO;
+  const start = new Date(startISO), end = new Date(start.getTime() + DURATION_MIN*60000);
+  const fmt = d => d.toISOString().replace(/[-:]/g,"").replace(/\.\d{3}/,"");
+  const joinReal = isMerge(JOIN_LINK) ? params.get("join_link") : JOIN_LINK;
+  const join = joinReal || "Your join link arrives by text and email before class.";
+  const calTitle = "The Quiet Mind Method (free, live with Shalin)";
+  const calDesc = "Free live Masterclass with Shalin Desai (Art of Living). Sit somewhere comfortable for the 10-minute guided practice. Camera optional. " + join;
+  const gcal = "https://calendar.google.com/calendar/render?action=TEMPLATE"
+    + "&text=" + encodeURIComponent(calTitle) + "&dates=" + fmt(start) + "/" + fmt(end)
+    + "&details=" + encodeURIComponent(calDesc) + "&location=" + encodeURIComponent(joinReal || "Online");
+  $$(".gcalBtn").forEach(a=>{ a.href = gcal; a.addEventListener("click", ()=>tick("cal")); });
+  $$(".icsBtn").forEach(b=>b.addEventListener("click", ()=>{
+    const esc = s => s.replace(/([,;\\])/g,"\\$1").replace(/\n/g,"\\n");
+    const ics = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Art of Living//Quiet Mind Method//EN","CALSCALE:GREGORIAN","METHOD:PUBLISH",
+      "BEGIN:VEVENT","UID:qmm-"+fmt(start)+"@artofliving.org","DTSTAMP:"+fmt(new Date()),
+      "DTSTART:"+fmt(start),"DTEND:"+fmt(end),"SUMMARY:"+esc(calTitle),"DESCRIPTION:"+esc(calDesc),
+      "LOCATION:"+esc(joinReal || "Online"),
+      "BEGIN:VALARM","TRIGGER:-PT15M","ACTION:DISPLAY","DESCRIPTION:Quiet Mind Method starts in 15 minutes","END:VALARM",
+      "END:VEVENT","END:VCALENDAR"].join("\r\n");
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([ics],{type:"text/calendar;charset=utf-8"}));
+    a.download = "quiet-mind-method.ics"; document.body.appendChild(a); a.click();
+    setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();}, 500);
+    tick("cal");
+  }));
+
+  // ---- video: cover, pin on mobile while playing, row cue highlighting ----
+  const vid = $("#vsl"), cover = $("#vcover"), vwrap = $("#vwrap");
+  const videoPlaying = ()=> vid && !vid.paused && !vid.ended;
+  if(vid){
+    cover.addEventListener("click", ()=>{ cover.classList.add("hide"); const p = vid.play(); if(p&&p.catch) p.catch(()=>{}); });
+    vid.addEventListener("play", ()=>{ vid.controls = true; cover.classList.add("hide"); vwrap.classList.add("pinned"); });
+    vid.addEventListener("pause", ()=> vwrap.classList.remove("pinned"));
+    vid.addEventListener("ended", ()=>{ vwrap.classList.remove("pinned"); setCue(-1);
+      const target = answered()===4 ? "#send" : "#check"; document.querySelector(target).scrollIntoView({behavior:"smooth"}); });
+    vid.addEventListener("loadedmetadata", ()=>{ if(isFinite(vid.duration)){ const m=Math.floor(vid.duration/60), s=String(Math.floor(vid.duration%60)).padStart(2,"0"); $("#vdur").textContent=`(${m}:${s}, sound on)`; } });
+    vid.addEventListener("timeupdate", ()=>{
+      const t = vid.currentTime; let idx=-1;
+      for(let i=0;i<4;i++){ if(t>=ROW_CUES[i] && t<ROW_CUES[i+1]) idx=i; }
+      setCue(idx);
+    });
+    vid.addEventListener("error", ()=>{ cover.querySelector(".vt").textContent = "Video loading…"; });
+  }
+  let curCue=-1;
+  function setCue(i){
+    if(i===curCue) return; curCue=i;
+    $$(".row").forEach((r,k)=>r.classList.toggle("cue", k===i));
+    if(i>=0 && window.matchMedia("(max-width:759px)").matches){
+      const row = $$(".row")[i], vh = vwrap.getBoundingClientRect().height;
+      const y = row.getBoundingClientRect().top + window.scrollY - vh - 12;
+      window.scrollTo({top:y, behavior:"smooth"});
+    }
+  }
+
+  // ---- phone ----
+  const phoneEl = $("#phone");
+  if(isMerge(phoneEl.value)) phoneEl.value = params.get("phone") || "";
+  function normPhone(v){
+    const d = (v||"").replace(/\D/g,"");
+    if(d.length===10) return "+1"+d;
+    if(d.length===11 && d[0]==="1") return "+"+d;
+    if(v.trim().startsWith("+") && d.length>=10 && d.length<=15) return "+"+d;
+    return null;
+  }
+
+  // ---- submit ----
+  $("#ctaForm").addEventListener("submit", async e=>{
+    e.preventDefault();
+    const err = $("#err"); err.textContent="";
+    if(answered() < 4){ err.textContent = `Grade all 4 rows first (${answered()}/4 done) so we can text your score.`; $("#check").scrollIntoView({behavior:"smooth"}); return; }
+    const phone = normPhone(phoneEl.value);
+    if(!phone){ err.textContent = "Please enter a valid mobile number."; phoneEl.focus(); return; }
+    const payload = buildPayload({phone, sms_consent:true, channel:"form"});
+    const btn = $("#submitBtn"); btn.disabled = true; btn.innerHTML = "<span>Sending…</span>";
+    await sendPayload(payload);
+    track("QuietMindTextOptIn", {channel:"form", quiet_mind_type: payload.quiet_mind_type});
+    state.submitted = true; state.channel = "form"; persist();
+    showDone(true);
+  });
+
+  function buildPayload(extra){
+    const reds = ROWS.filter(r=>state.scores[r.id]==="red").map(r=>r.id);
+    const yellows = ROWS.filter(r=>state.scores[r.id]==="yellow").map(r=>r.id);
+    const top = topRow();
+    const phone = extra.phone || null;
+    const payload = {
+      scores: Object.assign({}, state.scores),      // {sleep:"red", replay:"yellow", tension:..., energy:...}
+      score_total: total(),                          // 0–8
+      reds, yellows,
+      question: (state.question||"").trim(),
+      phone,                                         // E.164
+      sms_consent: true,
+      contact_id: params.get("contact_id") || (isMerge(CONTACT_ID) ? null : CONTACT_ID),
+      utm: Object.fromEntries([...params].filter(([k])=>k.startsWith("utm_"))),
+      tag: "qmc_completed",
+      submitted_at: new Date().toISOString(),
+      page: location.href,
+      // v3 additive fields (safe to ignore):
+      top_signal: top ? top.id : null,               // sleep | replay | tension | energy | null (all green)
+      quiet_mind_type: (top||STEADY).type,           // "The Replayer" etc.
+      mind_noise_before: state.noise,                // 1–10 or null
+      // v5 additive fields (safe to ignore):
+      channel: extra.channel,                        // "form" (typed number) | "sms_link" (opened the texting app with the result)
+      ref: state.ref,                                // also appears in the pre-filled text as "QMC-<ref>", so an inbound text can be matched to this contact
+      faq_opened: state.faq.slice(),
+      seats_left_seen: (typeof hasSeats!=="undefined" && hasSeats) ? seatsLeft : null,   // v5.1: seats-left number this person saw (null if bar hidden)                 // FAQ ids opened on this page, e.g. ["catch","replay"]
+      event_id: "qmc-" + state.ref + "-QuietMindTextOptIn", // = the eventID the browser pixel used, so a CAPI copy of this event dedupes
+      fbp: cookie("_fbp"), fbc: cookie("_fbc") || (params.get("fbclid") ? `fb.1.${Date.now()}.${params.get("fbclid")}` : null)
+    };
+    payload.sms_consent = !!extra.sms_consent;
+    return payload;
+  }
+  async function sendPayload(payload){
+    try{
+      if(window.__QMC_TEST_MODE__){ (window.__QMC_PAYLOADS__ = window.__QMC_PAYLOADS__ || []).push(payload); window.__QMC_LAST_PAYLOAD__ = payload; }
+      else{ await fetch(WEBHOOK_URL, {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(payload), keepalive:true}); }
+    }catch(ex){ console.warn("Webhook failed", ex); }
+  }
+  function cookie(n){ const m = document.cookie.match(new RegExp("(?:^|; )"+n+"=([^;]*)")); return m ? decodeURIComponent(m[1]) : null; }
+  function track(name, data){
+    try{ if(typeof window.fbq === "function") window.fbq("trackCustom", name, data, {eventID: "qmc-" + state.ref + "-" + name}); }catch(e){}
+  }
+
+  // ---- v5 text-first path ----
+  const smsNum = (()=>{ const v = isMerge(SMS_NUMBER) ? (params.get("sms_number")||"") : SMS_NUMBER; const d = v.replace(/[^\d+]/g,""); return d.replace(/\D/g,"").length>=10 ? d : ""; })();
+  const isPhone = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || (navigator.maxTouchPoints>1 && /Macintosh/.test(navigator.userAgent));
+  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.maxTouchPoints>1 && /Macintosh/.test(navigator.userAgent));
+  if(smsNum && isPhone) $("#ctaCard").classList.add("textfirst");
+  function smsHref(){ return `sms:${smsNum}${isIOS?"&":"?"}body=${encodeURIComponent(assessmentText())}`; }
+  $("#smsBtn").addEventListener("click", e=>{
+    const err = $("#smsErr"); err.textContent = "";
+    if(answered() < 4){ e.preventDefault(); err.textContent = `Grade all 4 rows first (${answered()}/4 done) so your text includes your score.`; $("#check").scrollIntoView({behavior:"smooth"}); return; }
+    const href = smsHref(); $("#smsBtn").setAttribute("href", href);
+    if(window.__QMC_TEST_MODE__){ e.preventDefault(); window.__QMC_SMS_HREF__ = href; }
+    sendPayload(buildPayload({phone:null, sms_consent:false, channel:"sms_link"}));
+    track("QuietMindTextOptIn", {channel:"sms_link", quiet_mind_type:(topRow()||STEADY).type});
+    state.submitted = true; state.channel = "sms_link"; persist();
+    setTimeout(()=>showDone(false), 600);
+  });
+  $("#useForm").addEventListener("click", ()=>{ $("#ctaCard").classList.add("formopen"); $("#phone").focus(); });
+  $("#smsRetry").addEventListener("click", ()=>{ state.submitted=false; state.channel=null; persist(); $("#ctaCard").classList.remove("done"); $("#ctaCard").classList.add("formopen");
+    const pill=$("#statusPill"); pill.classList.remove("ok"); $("#statusText").textContent="Action needed: 1 step left"; $("#bar").classList.remove("done"); $("#phone").focus(); });
+  $("#copyBtn").addEventListener("click", async ()=>{
+    const t = $("#assessText"); try{ await navigator.clipboard.writeText(t.value); toast("Copied. Paste it anywhere."); }catch(e){ t.select(); document.execCommand && document.execCommand("copy"); toast("Copied."); }
+  });
+  // ---- FAQ open tracking (which objections people check) ----
+  $$("details[data-faq]").forEach(d=> d.addEventListener("toggle", ()=>{ if(d.open && !state.faq.includes(d.dataset.faq)){ state.faq.push(d.dataset.faq); persist(); } }));
+
+  function showDone(scroll){
+    $("#ctaCard").classList.add("done");
+    $("#success").classList.toggle("via-sms", state.channel==="sms_link");
+    const pill = $("#statusPill"); pill.classList.add("ok"); $("#statusText").textContent = "Personalized";
+    $("#bar").classList.add("done");
+    $("#progressText").innerHTML = "<b>All set</b> · See you live";
+    const top = topRow();
+    $("#successScore").textContent = answered()===4 ? `${(top||STEADY).type} · ${total()} / 8${state.noise? ` · before-number ${state.noise}/10`:""}` : "";
+    if(!$("#stickyBtn").dataset.live) $("#sticky").classList.remove("show");
+    restoreTodo();
+    if(scroll) $("#success").focus({preventScroll:false});
+  }
+
+  // ---- post-submit checklist ----
+  function tick(k){ state.todo[k]=true; persist(); restoreTodo(); }
+  function restoreTodo(){
+    $$("#todo input[data-k]").forEach(i=> i.checked = !!state.todo[i.dataset.k]);
+    $$("#spotChips .chip").forEach(c=> c.setAttribute("aria-pressed", String(c.dataset.spot===state.spot)));
+  }
+  $("#todo").addEventListener("change", e=>{ const i=e.target.closest("input[data-k]"); if(i){ state.todo[i.dataset.k]=i.checked; persist(); } });
+  $("#spotChips").addEventListener("click", e=>{ const c=e.target.closest(".chip"); if(!c) return; state.spot=c.dataset.spot; tick("spot"); });
+
+  // ---- share ----
+  function toast(m){ const t=$("#toast"); t.textContent=m; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),2200); }
+  $("#shareBtn").addEventListener("click", async ()=>{
+    const data = {title:"The Quiet Mind Method (free live class)", text:"I signed up for this free live class on why you can't shut your mind off at night. Want to come too?", url:SHARE_URL};
+    try{
+      if(navigator.share){ await navigator.share(data); return; }
+      await navigator.clipboard.writeText(data.text+" "+data.url); toast("Link copied. Paste it in a text.");
+    }catch(e){ /* user cancelled */ }
+  });
+
+  // ---- v5.1 urgency: countdown + seats (real data only) ----
+  const sessionISOReal = isMerge(SESSION_ISO) ? (params.get("session_date_iso") || "") : SESSION_ISO;  // no FALLBACK_ISO here: never count down to a made-up time
+  const sessionStart = sessionISOReal ? new Date(sessionISOReal) : null;
+  const hasCd = !!(sessionStart && !isNaN(sessionStart.getTime()));
+  const toInt = v => { v = String(v==null?"":v).trim().replace(/,/g,""); return /^\d+$/.test(v) ? parseInt(v,10) : NaN; };
+  const seatsLeft = toInt(isMerge(SEATS_LEFT) ? params.get("seats_left") : SEATS_LEFT);
+  const seatsTotal = toInt(isMerge(SEATS_TOTAL) ? params.get("seats_total") : SEATS_TOTAL);
+  const hasSeats = !isNaN(seatsLeft) && !isNaN(seatsTotal) && seatsTotal > 0 && seatsLeft <= seatsTotal;
+  const seatsLow = hasSeats && (seatsLeft <= SEATS_LOW_ABS || seatsLeft/seatsTotal <= SEATS_LOW_PCT);
+  let liveMode = "pre";  // pre | live | ended
+  if(hasSeats){
+    const dayTxt = txt("session_day");
+    const forDay = dayTxt ? ` for ${dayTxt}` : " for this session";
+    $("#seatsText").textContent = seatsLeft === 0 ? `All ${seatsTotal} live seats${forDay} are taken. Yours is saved.`
+      : (seatsLow ? `Only ${seatsLeft} of ${seatsTotal} live seats left${forDay}` : `${seatsLeft} of ${seatsTotal} live seats left${forDay}`);
+    $("#seatsPct").textContent = `${Math.round((seatsTotal-seatsLeft)/seatsTotal*100)}% taken`;
+    $("#seats").classList.toggle("low", seatsLow);
+    $("#seats").hidden = false;
+    requestAnimationFrame(()=>{ $("#seatsFill").style.width = ((seatsTotal-seatsLeft)/seatsTotal*100).toFixed(1) + "%"; });
+    $("#stickySeats").textContent = seatsLeft > 0 ? `${seatsLeft} seats left` : "";
+    if(seatsLow) $("#stickySeats").className = "low";
+  }
+  if(hasCd) $("#cdWrap").hidden = false; else $("#urg").classList.add("no-cd");
+  if(hasCd || hasSeats) $("#urg").hidden = false;
+  if(hasCd || hasSeats) $("#stickyCd").hidden = false;
+  if(joinReal){ $("#cdJoin").href = joinReal; } else { $("#cdJoin").hidden = true; $("#cdNoLink").hidden = false; }
+  const pad = n => String(n).padStart(2,"0");
+  function tickCd(){
+    if(!hasCd) return;
+    const now = Date.now(), ms = sessionStart.getTime() - now, endMs = sessionStart.getTime() + DURATION_MIN*60000 - now;
+    const mode = ms > 0 ? "pre" : (endMs > 0 ? "live" : "ended");
+    if(mode === "pre"){
+      const t = Math.floor(ms/1000), d = Math.floor(t/86400), h = Math.floor(t%86400/3600), m = Math.floor(t%3600/60), sec = t%60;
+      $("#cdD").textContent = d; $("#cdH").textContent = pad(h); $("#cdM").textContent = pad(m); $("#cdS").textContent = pad(sec);
+      $("#stickyCdText").innerHTML = `Live in <b>${d ? d+"d " : ""}${pad(h)}:${pad(m)}:${pad(sec)}</b>`;
+    }
+    if(mode !== liveMode){
+      liveMode = mode;
+      const urg = $("#urg");
+      urg.classList.toggle("is-live", mode !== "pre");
+      $("#holdNote").hidden = mode !== "pre";   // no "seats fill" nudge once class has started
+      if(mode === "live"){
+        $("#cdLiveText").textContent = "We're live, join now";
+        $("#stickyCdText").innerHTML = '<span class="livedot"></span><b>We\'re live now</b>';
+        if(joinReal){ const sb = $("#stickyBtn"); sb.textContent = "🔴 We're live, join now →"; sb.href = joinReal; sb.target = "_blank"; sb.rel = "noopener"; sb.dataset.live = "1"; }
+        $("#seats").hidden = true; $("#stickySeats").textContent = "";
+        $("#sticky").classList.add("show");
+      }
+      if(mode === "ended"){
+        $("#cdLiveText").textContent = "This session has ended.";
+        $("#cdJoin").hidden = true; $("#cdNoLink").hidden = true;
+        $("#cdLive").insertAdjacentHTML("beforeend", `<p class="small" style="margin:8px 0 0">Missed it? <a href="${rebookHref}">Pick another live session</a>.</p>`);
+        $("#stickyCd").hidden = true; $("#seats").hidden = true;
+        const sb = $("#stickyBtn"); if(sb.dataset.live){ sb.removeAttribute("target"); delete sb.dataset.live; sb.href = "#check"; sb.textContent = "Find my Quiet Mind type →"; }
+        $("#sticky").classList.remove("show");
+      }
+    }
+  }
+  tickCd();
+  if(hasCd) setInterval(tickCd, 1000);
+
+  // ---- sticky mobile CTA ----
+  const sticky = $("#sticky");
+  if("IntersectionObserver" in window){
+    const vis = {check:false, send:false};
+    const io = new IntersectionObserver(entries=>{
+      entries.forEach(en=>{ vis[en.target.id] = en.isIntersecting; });
+      sticky.classList.toggle("show", liveMode === "live" && !!joinReal || (!state.submitted && !vis.check && !vis.send && window.scrollY > 200));
+    });
+    io.observe($("#check")); io.observe($("#send"));
+    window.addEventListener("scroll", ()=>{ if(window.scrollY<=200 && !(liveMode === "live" && joinReal)) sticky.classList.remove("show"); }, {passive:true});
+  }
+
+  if(document.querySelector('[data-placeholder="true"]')) console.info("[QMC] Placeholder testimonials present: replace before launch (see NOTES.md).");
+  render();
+  if(state.submitted){ showDone(false); }
+})();
+</script>
+</body>
+</html>
